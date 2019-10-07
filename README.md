@@ -13,5 +13,6 @@
     *Физические показатели покемона*  
     
 ## Экраны приложения
-! [Список покемонов] (https://github.com/Paulik8/pokedexapp/blob/master/screenshots/list.jpg =768x1024)
+Список покемонов  
+<a href="url"><img src="https://github.com/Paulik8/pokedexapp/blob/master/screenshots/list.jpg" align="left" height="1024" width="768" ></a>
     
