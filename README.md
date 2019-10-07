@@ -13,10 +13,18 @@
     * Физические показатели покемона    
     
 ## Экраны приложения
-Список покемонов   
-<a href="url"><img src="https://github.com/Paulik8/pokedexapp/blob/master/screenshots/list.jpg" align="left" height="512" width="384" ></a>  
-Профиль покемона    
-<a href="url"><img src="https://github.com/Paulik8/pokedexapp/blob/master/screenshots/info.jpg" align="left" height="512" width="384" ></a>  
-История эволюции покемона  
-<a href="url"><img src="https://github.com/Paulik8/pokedexapp/blob/master/screenshots/evolution.jpg" align="left" height="512" width="384" ></a>  
+<div>
+    <div>
+    <p>Список покемонов</p>   
+    <a href="url"><img src="https://github.com/Paulik8/pokedexapp/blob/master/screenshots/list.jpg" height="512" width="384"></a> 
+    </div>
+    <div>
+    <p>Профиль покемона</p> 
+    <a href="url"><img src="https://github.com/Paulik8/pokedexapp/blob/master/screenshots/info.jpg" height="512" width="384"></a> 
+    </div>
+    <div>
+    <p>История эволюции покемона </p> 
+    <a href="url"><img src="https://github.com/Paulik8/pokedexapp/blob/master/screenshots/evolution.jpg" height="512" width="384"></a> 
+    </div>
+</div>
     
