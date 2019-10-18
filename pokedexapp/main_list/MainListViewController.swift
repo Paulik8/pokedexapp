@@ -13,7 +13,9 @@ class MainListViewController: UIViewController {
     private var viewModel = MainViewModel()
     private let navigationTitle = "Pokemons"
     
-    private let cellIdentifier = "pokemonList"
+    private let tableCellIdentifier = "pokemonTableList"
+    private let collectionCellIdentifier = "pokemonCollectionList"
+    
     
     private var listTableView: UITableView!
     
@@ -40,7 +42,7 @@ class MainListViewController: UIViewController {
             table.estimatedRowHeight = UITableView.automaticDimension
             table.delegate = self
             table.dataSource = self
-            table.register(PokemonListTableViewCell.self, forCellReuseIdentifier: cellIdentifier)
+            table.register(PokemonListTableViewCell.self, forCellReuseIdentifier: tableCellIdentifier)
             return table
         }()
         title = navigationTitle
@@ -61,6 +63,31 @@ class MainListViewController: UIViewController {
 
 }
 
+extension MainListViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return viewModel.pokemons?.results[collectionView.tag].type.count ?? 0
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: collectionCellIdentifier, for: indexPath) as! TypeCollectionViewCell
+        guard let currentType = viewModel.pokemons?.results[collectionView.tag].type[indexPath.item] else { return cell }
+        cell.type.text = currentType
+        cell.type.backgroundColor = cell.changeColor(currentType)
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 12.0
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: collectionCellIdentifier, for: indexPath) as! TypeCollectionViewCell
+        return CGSize(width: cell.type.frame.width, height: cell.type.frame.height)
+    }
+    
+}
+
 extension MainListViewController:  UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -72,12 +99,13 @@ extension MainListViewController:  UITableViewDelegate {
 extension MainListViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = listTableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! PokemonListTableViewCell
+        let cell = listTableView.dequeueReusableCell(withIdentifier: tableCellIdentifier, for: indexPath) as! PokemonListTableViewCell
         let row = indexPath.row
         guard let pokemons = viewModel.pokemons?.results else { return cell }
         let currentPokemon = pokemons[row]
         cell.name.text = currentPokemon.name
         cell.photo.loadImageFromUrl(currentPokemon.sprites.large)
+        cell.setCollectionViewData(source: self, row: row)
         return cell
     }
     

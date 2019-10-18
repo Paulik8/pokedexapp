@@ -22,8 +22,6 @@ class MainViewModel: Notifier {
         service.viewModel = self
     }
     
-    
-    
     func createRequest() {
         service.getPokemons()
     }

@@ -26,6 +26,7 @@ class Service {
                 pokemons.results = pokemons.results.getUniquePokemons {
                     $0.name
                 }
+//                pokemons.results = pokemons.results.shorted()
                 self.viewModel!.notifyData(pokemons)
             } catch {
                 print(error)

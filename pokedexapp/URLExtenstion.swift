@@ -35,4 +35,17 @@ extension Array {
         
         return buffer
     }
+    
+    func shorted() -> [Element] {
+        var buf = [Element]()
+        var counter = 0
+        for val in self {
+            counter += 1
+            if (counter == 2) {
+                return buf
+            }
+            buf.append(val)
+        }
+        return buf
+    }
 }
