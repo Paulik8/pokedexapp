@@ -8,11 +8,13 @@
 
 import Foundation
 
-class Service {
+struct Service {
     
     var viewModel: Notifier?
     
     let listPokemonUrl = "https://raw.githubusercontent.com/joseluisq/pokemons/master/pokemons.json"
+    
+    let infoPokemonUrl = "https://pokeapi.co/api/v2/pokemon/"
     
     
     func getPokemons() {
@@ -26,12 +28,25 @@ class Service {
                 pokemons.results = pokemons.results.getUniquePokemons {
                     $0.name
                 }
-//                pokemons.results = pokemons.results.shorted()
                 self.viewModel!.notifyData(pokemons)
             } catch {
                 print(error)
             }
             }.resume()
+    }
+    
+    func getInfoPokemon(name: String) {
+        guard let url = URL(string: infoPokemonUrl + "\(name)") else { return }
+        URLSession.shared.dataTask(with: url) { (data, res, err) in
+          do {
+            guard let data = data else { return }
+            let decodedPokemonInfo = try JSONDecoder().decode(PokemonInfo.self, from: data)
+            self.viewModel?.notifyData(decodedPokemonInfo)
+            }
+            catch {
+                print(error)
+            }
+        }.resume()
     }
     
     func getValue() -> String {

@@ -48,9 +48,9 @@ class PokemonListTableViewCell: UITableViewCell {
         collection.delegate = source
         collection.dataSource = source
         collection.tag = row
-//        DispatchQueue.main.async {
-//            self.collection.reloadData()
-//        }
+        DispatchQueue.main.async {
+            self.collection.reloadData()
+        }
     }
     
     private func setupUi() {

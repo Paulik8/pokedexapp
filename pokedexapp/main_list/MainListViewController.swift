@@ -32,7 +32,7 @@ class MainListViewController: UIViewController {
     }
     
     private func setupListeners() {
-        viewModel.delegate = self
+        viewModel.subscriber = self
     }
     
     private func setupUi() {
@@ -104,13 +104,21 @@ extension MainListViewController: UITableViewDataSource {
         guard let pokemons = viewModel.pokemons?.results else { return cell }
         let currentPokemon = pokemons[row]
         cell.name.text = currentPokemon.name
-        cell.photo.loadImageFromUrl(currentPokemon.sprites.large)
+        cell.photo.loadImageFromUrl(currentPokemon.sprites.large) {
+            
+        }
         cell.setCollectionViewData(source: self, row: row)
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        guard let name = viewModel.pokemons?.results[indexPath.row].name.lowercased() else { return }
+        let infoVC = InfoViewController()
+        infoVC.setPokemonName(name: name)
+        self.navigationController?.pushViewController(infoVC, animated: true)
+//        infoVC.modalPresentationStyle = .formSheet
+//        self.present(infoVC, animated: true, completion:  nil)
     }
     
 }

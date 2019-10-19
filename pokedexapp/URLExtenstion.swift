@@ -9,13 +9,14 @@
 import UIKit
 
 extension UIImageView {
-    func loadImageFromUrl(_ urlStr: String) {
+    func loadImageFromUrl(_ urlStr: String, _ callback: @escaping () -> Void) {
         guard let url = URL(string: urlStr) else { return }
         URLSession.shared.dataTask(with: url) { (data, res, err) in
             if err != nil { return }
             guard let image = data else { return }
             DispatchQueue.main.async {
                 self.image = UIImage(data: image)
+                callback()
             }
             }.resume()
     }

@@ -10,10 +10,10 @@ import UIKit
 
 class MainViewModel: Notifier {
     
-    var delegate: SubscriberDelegate?
+    var subscriber: SubscriberDelegate?
     var pokemons: Pokemon? {
         didSet {
-            delegate!.notify()
+            subscriber!.notify()
         }
     }
     var service = Service()
@@ -29,8 +29,8 @@ class MainViewModel: Notifier {
     
     //start Notifier
     
-    func notifyData(_ data: Pokemon?) {
-        pokemons = data
+    func notifyData(_ data: Any?) {
+        pokemons = data as? Pokemon
     }
     
     //end

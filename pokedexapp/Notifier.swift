@@ -9,5 +9,5 @@
 import Foundation
 
 protocol Notifier {
-    func notifyData(_ data: Pokemon?)
+    func notifyData(_ data: Any?)
 }
