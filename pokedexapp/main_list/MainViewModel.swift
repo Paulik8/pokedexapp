@@ -17,15 +17,20 @@ class MainViewModel: Notifier {
         }
     }
     var service = Service()
+    var converter = MainConverter()
     
     init() {
         service.viewModel = self
+        service.converter = converter
     }
     
     func createRequest() {
         service.getPokemons()
     }
     
+    func checkCharsName(name: String) -> String {
+        return service.charCheck(name: name)
+    }
     
     //start Notifier
     

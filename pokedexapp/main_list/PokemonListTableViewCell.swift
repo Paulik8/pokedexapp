@@ -19,6 +19,7 @@ class PokemonListTableViewCell: UITableViewCell {
     }()
     var name: UITextField! = {
         let name = UITextField()
+        name.isUserInteractionEnabled = false
         name.font = UIFont.systemFont(ofSize: 18.0)
         name.translatesAutoresizingMaskIntoConstraints = false
         return name

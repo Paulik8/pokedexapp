@@ -99,18 +99,15 @@ extension InfoViewController: SubscriberDelegate {
     
     func notify() {
         
-        if let data = self.viewModel.pokemonInfo {
-            self.height.elementValue.text = "\(data.height)"
-            self.weight.elementValue.text = "\(data.weight)"
-        }
-        
         DispatchQueue.main.async {
+            if let data = self.viewModel.pokemonInfo {
+                self.height.elementValue.text = "\(data.height)"
+                self.weight.elementValue.text = "\(data.weight)"
+            }
+        
             if let image = self.viewModel.poster.image {
                 self.photo.image = image
             }
         }
-        
     }
-    
-    
 }

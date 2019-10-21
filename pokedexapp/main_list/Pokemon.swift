@@ -15,8 +15,8 @@ struct Pokemon: Codable {
 struct Result: Codable {
     let nationalNumber: String
     let evolution: Evolution?
-    let sprites: Images
-    let name: String
+    var sprites: Images
+    var name: String
     let type: [String]
     let total, hp, attack, defense: Int
     let spAtk, spDef, speed: Int
@@ -32,7 +32,7 @@ struct Result: Codable {
 
 struct Images: Codable {
     let normal: String
-    let large: String
+    var large: String
     let animated: String
 }
 

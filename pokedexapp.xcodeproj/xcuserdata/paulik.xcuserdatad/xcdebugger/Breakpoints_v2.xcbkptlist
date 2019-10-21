@@ -425,32 +425,32 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "EEDDF2B6-ACB7-4E9C-91C9-8F4531BF547C"
+            uuid = "ACBC99EE-C056-4180-98D4-2793B9608AEE"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "pokedexapp/info/InfoViewController.swift"
+            filePath = "pokedexapp/Service.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "106"
-            endingLineNumber = "106"
-            landmarkName = "notify()"
+            startingLineNumber = "60"
+            endingLineNumber = "60"
+            landmarkName = "charCheck(name:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "9F071094-8189-4D90-82D3-5BA2D4EC7C23"
+            uuid = "1C1F683C-BF54-49BE-B9D2-352774EF0FE6"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "pokedexapp/info/InfoViewController.swift"
+            filePath = "pokedexapp/Service.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "102"
-            endingLineNumber = "102"
-            landmarkName = "notify()"
+            startingLineNumber = "36"
+            endingLineNumber = "36"
+            landmarkName = "getPokemons()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
