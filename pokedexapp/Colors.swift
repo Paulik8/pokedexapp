@@ -22,6 +22,9 @@ struct Colors {
     static var DRAGON = UIColor(red: 229/255, green: 70/255, blue: 46/255, alpha: 1)
     static var FIRE = UIColor.orange
     
+    static var LEFT_GRADIENT = UIColor(red: 58/255, green: 99/255, blue: 224/255, alpha: 1)
+    static var RIGHT_GRADIENT = UIColor(red: 82/255, green: 171/255, blue: 199/255, alpha: 1)
+    
 }
 //найти узкое место системы если p11 = p22
 //найти область значений лямбда при которых система будет work

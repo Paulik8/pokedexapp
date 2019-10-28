@@ -6,4 +6,21 @@
 //  Copyright © 2019 Paulik. All rights reserved.
 //
 
-import Foundation
+import UIKit
+import FirebaseAuth
+
+class LoginViewModel {
+    
+    let addition = "@gmail.com"
+    var loginVC: LoginNotifier?
+    
+    func handleButtonClick(name: String, password: String) {
+        let email = name.lowercased() + addition
+        Auth.auth().createUser(withEmail: email, password: password) { (user, err) in
+            if (user != nil) {
+                self.loginVC?.successLogin()
+            }
+        }
+    }
+    
+}
