@@ -19,7 +19,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         let loginVC = LoginViewController()
         window = UIWindow()
-        window?.rootViewController = loginVC
+        let navigationVC = UINavigationController(rootViewController: loginVC)
+        navigationVC.navigationBar.setValue(true, forKey: "hidesShadow")
+        navigationVC.navigationBar.barTintColor = Colors.DEFAULT_BACKGROUND
+        window?.rootViewController = navigationVC
         window?.makeKeyAndVisible()
         FirebaseApp.configure()
         // Override point for customization after application launch.

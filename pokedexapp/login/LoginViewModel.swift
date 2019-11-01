@@ -14,13 +14,17 @@ class LoginViewModel {
     let addition = "@gmail.com"
     var loginVC: LoginNotifier?
     
-    func handleButtonClick(name: String, password: String) {
-        let email = name.lowercased() + addition
-        Auth.auth().createUser(withEmail: email, password: password) { (user, err) in
+    func handleSubmitClick(name: String, password: String) {
+        let email = name.trimmingCharacters(in: .whitespaces).lowercased() + addition
+        Auth.auth().signIn(withEmail: email, password: password) { (user, err) in
             if (user != nil) {
                 self.loginVC?.successLogin()
             }
         }
+    }
+    
+    func handleSignUpClick() {
+        loginVC?.openSignUp()
     }
     
 }

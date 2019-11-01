@@ -22,8 +22,12 @@ struct Colors {
     static var DRAGON = UIColor(red: 229/255, green: 70/255, blue: 46/255, alpha: 1)
     static var FIRE = UIColor.orange
     
-    static var LEFT_GRADIENT = UIColor(red: 58/255, green: 99/255, blue: 224/255, alpha: 1)
-    static var RIGHT_GRADIENT = UIColor(red: 82/255, green: 171/255, blue: 199/255, alpha: 1)
+    static var LEFT_GRADIENT_LOGIN = UIColor(red: 58/255, green: 99/255, blue: 224/255, alpha: 1)
+    static var RIGHT_GRADIENT_LOGIN = UIColor(red: 82/255, green: 171/255, blue: 199/255, alpha: 1)
+    
+    static var LEFT_GRADIENT_SIGNUP = UIColor(red: 41/255, green: 181/255, blue: 36/255, alpha: 1)
+//    static var RIGHT_GRADIENT_SIGNUP = UIColor(red: 255/255, green: 254/255, blue: 2/255, alpha: 1)
+    static var RIGHT_GRADIENT_SIGNUP = UIColor(red: 233/255, green: 213/255, blue: 30/255, alpha: 1)
     
 }
 //найти узкое место системы если p11 = p22

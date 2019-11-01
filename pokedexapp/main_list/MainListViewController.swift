@@ -117,8 +117,6 @@ extension MainListViewController: UITableViewDataSource {
         let infoVC = InfoViewController()
         infoVC.setPokemonName(name: name)
         self.navigationController?.pushViewController(infoVC, animated: true)
-//        infoVC.modalPresentationStyle = .formSheet
-//        self.present(infoVC, animated: true, completion:  nil)
     }
     
 }

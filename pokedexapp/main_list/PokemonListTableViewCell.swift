@@ -45,7 +45,6 @@ class PokemonListTableViewCell: UITableViewCell {
     }
     
     func setCollectionViewData(source: UICollectionViewDataSource & UICollectionViewDelegateFlowLayout, row: Int) {
-        print ("set")
         collection.delegate = source
         collection.dataSource = source
         collection.tag = row

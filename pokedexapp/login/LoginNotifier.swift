@@ -12,4 +12,6 @@ protocol LoginNotifier {
     
     func successLogin()
     
+    func openSignUp()
+    
 }
