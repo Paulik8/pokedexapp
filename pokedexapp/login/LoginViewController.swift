@@ -79,10 +79,15 @@ class LoginViewController: AuthViewController {
         setupUi()
         setupListeners()
         super.viewDidLoad()
+//        checkUser()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         buttonDown()
+    }
+    
+    private func checkUser() {
+        viewModel.checkUser()
     }
     
     override func setupListeners() {
