@@ -66,7 +66,8 @@ class MainListViewController: UIViewController {
         title = navigationTitle
         
         profileImage = UIButton()
-        profileImage.setImage(#imageLiteral(resourceName: "right"), for: .normal)
+        profileImage.setImage(#imageLiteral(resourceName: "profile"), for: .normal)
+        profileImage.imageView?.contentMode = .scaleAspectFill
         guard let navBar = navigationController?.navigationBar else { return }
         navBar.addSubview(profileImage)
         profileImage.frame = CGRect(x: 0, y: 0, width: NavigationConstants.ImageSizeForLargeState, height: NavigationConstants.ImageSizeForLargeState)
