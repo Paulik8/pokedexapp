@@ -16,8 +16,10 @@ class MainListViewController: UIViewController {
     private let tableCellIdentifier = "pokemonTableList"
     private let collectionCellIdentifier = "pokemonCollectionList"
     
+    var topNavigationAnchor: NSLayoutConstraint?
     
     private var listTableView: UITableView!
+    var profileImage: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,11 +47,10 @@ class MainListViewController: UIViewController {
             table.register(PokemonListTableViewCell.self, forCellReuseIdentifier: tableCellIdentifier)
             return table
         }()
-        title = navigationTitle
-        navigationController?.navigationBar.prefersLargeTitles = true
+    
+        setupNavigationBar()
         
         view.addSubview(listTableView)
-        
         view.backgroundColor = .white
         
         NSLayoutConstraint.activate([
@@ -59,6 +60,66 @@ class MainListViewController: UIViewController {
             listTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -8)
             ])
         
+    }
+    
+    private func setupNavigationBar() {
+        title = navigationTitle
+        
+        profileImage = UIButton()
+        profileImage.setImage(#imageLiteral(resourceName: "right"), for: .normal)
+        guard let navBar = navigationController?.navigationBar else { return }
+        navBar.addSubview(profileImage)
+        profileImage.frame = CGRect(x: 0, y: 0, width: NavigationConstants.ImageSizeForLargeState, height: NavigationConstants.ImageSizeForLargeState)
+        profileImage.clipsToBounds = true
+        profileImage.layer.cornerRadius = NavigationConstants.ImageSizeForLargeState / 2
+        profileImage.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            profileImage.topAnchor.constraint(equalTo: navBar.topAnchor, constant: NavigationConstants.ImageTopMarginForLargeState),
+            profileImage.trailingAnchor.constraint(equalTo: navBar.trailingAnchor, constant: -NavigationConstants.ImageRightMargin),
+            profileImage.heightAnchor.constraint(equalToConstant: profileImage.frame.height),
+            profileImage.widthAnchor.constraint(equalToConstant: profileImage.frame.height)
+        ])
+        navigationController?.navigationBar.prefersLargeTitles = true
+        
+        profileImage.addTarget(self, action: #selector(profileClicked), for: .touchUpInside)
+    }
+    
+    private func moveAndResizeImage(for height: CGFloat) {
+        let coeff: CGFloat = {
+            let delta = height - NavigationConstants.NavBarHeightSmallState
+            let heightDifferenceBetweenStates = (NavigationConstants.NavBarHeightLargeState - NavigationConstants.NavBarHeightSmallState)
+            return delta / heightDifferenceBetweenStates
+        }()
+
+        let factor = NavigationConstants.ImageSizeForSmallState / NavigationConstants.ImageSizeForLargeState
+
+        let scale: CGFloat = {
+            let sizeAddendumFactor = coeff * (1.0 - factor)
+            return min(1.0, sizeAddendumFactor + factor)
+        }()
+
+        let sizeDiff = NavigationConstants.ImageSizeForLargeState * (1.0 - factor)
+        
+        let y: CGFloat = {
+            let y = (1 - scale) * NavigationConstants.ImageSizeForLargeState
+            return max (0, y)
+        }()
+
+        let xTranslation = max(0, sizeDiff - coeff * sizeDiff)
+        
+        profileImage.transform = CGAffineTransform.identity
+            .scaledBy(x: scale, y: scale)
+            .translatedBy(x: xTranslation, y: -(1 + scale) * y)
+    }
+    
+    @objc private func profileClicked() {
+        print ("clicked")
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard let height = navigationController?.navigationBar.frame.height else { return }
+        moveAndResizeImage(for: height)
     }
 
 }
@@ -104,9 +165,7 @@ extension MainListViewController: UITableViewDataSource {
         guard let pokemons = viewModel.pokemons?.results else { return cell }
         let currentPokemon = pokemons[row]
         cell.name.text = currentPokemon.name
-        cell.photo.loadImageFromUrl(currentPokemon.sprites.large) {
-            
-        }
+        cell.photo.loadImageFromUrl(currentPokemon.sprites.large) {}
         cell.setCollectionViewData(source: self, row: row)
         return cell
     }
@@ -114,9 +173,10 @@ extension MainListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         guard let name = viewModel.pokemons?.results[indexPath.row].name.lowercased() else { return }
-        let infoVC = InfoViewController()
-        infoVC.setPokemonName(name: name)
-        self.navigationController?.pushViewController(infoVC, animated: true)
+        profileImage.isHidden = true //
+        let infoVC = InfoViewController()//
+        infoVC.setPokemonName(name: name)//
+        self.navigationController?.pushViewController(infoVC, animated: true) //
     }
     
 }

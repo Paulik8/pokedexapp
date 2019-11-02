@@ -12,11 +12,14 @@ import FirebaseAuth
 class LoginViewModel {
     
     let addition = "@gmail.com"
+    var user: User?
     var loginVC: LoginNotifier?
     
     func checkUser() {
         DispatchQueue.main.async {
-            AuthRepository.shared.getUser()
+            guard let userData = AuthRepository.shared.getUser() else { return }
+            self.user = userData
+            self.loginVC?.successLogin()
         }
     }
     
