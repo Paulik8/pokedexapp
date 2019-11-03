@@ -16,16 +16,16 @@
 <div>
     <div>
     <p>Вход</p>   
-    <a href="url"><img src="https://github.com/Paulik8/pokedexapp/blob/master/screenshots/login" height="512" width="384"></a> 
+    <a href="url"><img src="https://github.com/Paulik8/pokedexapp/blob/master/screenshots/login.png" height="512" width="384"></a> 
     </div>
     <div>
     <div>
     <p>Регистрация</p>   
-    <a href="url"><img src="https://github.com/Paulik8/pokedexapp/blob/master/screenshots/signup" height="512" width="384"></a> 
+    <a href="url"><img src="https://github.com/Paulik8/pokedexapp/blob/master/screenshots/signup.png" height="512" width="384"></a> 
     </div>
     <div>
     <p>Список покемонов</p>   
-    <a href="url"><img src="https://github.com/Paulik8/pokedexapp/blob/master/screenshots/list" height="512" width="384"></a> 
+    <a href="url"><img src="https://github.com/Paulik8/pokedexapp/blob/master/screenshots/list.png" height="512" width="384"></a> 
     </div>
     <div>
     <p>Профиль покемона</p> 
