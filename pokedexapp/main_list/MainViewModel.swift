@@ -10,10 +10,10 @@ import UIKit
 
 class MainViewModel: Notifier {
     
-    var subscriber: SubscriberDelegate?
+    var mainVC: MainNotifier?
     var pokemons: Pokemon? {
         didSet {
-            subscriber!.notify()
+            mainVC!.updateData()
         }
     }
     var service = Service()
@@ -30,6 +30,11 @@ class MainViewModel: Notifier {
     
     func checkCharsName(name: String) -> String {
         return service.charCheck(name: name)
+    }
+    
+    func profileLongTouched() {
+        AuthRepository.shared.deleteUser()
+        mainVC?.openLogin()
     }
     
     //start Notifier

@@ -29,12 +29,16 @@ class MainListViewController: UIViewController {
         getData()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        profileImage.isHidden = false
+    }
+    
     private func getData() {
         _ = viewModel.createRequest()
     }
     
     private func setupListeners() {
-        viewModel.subscriber = self
+        viewModel.mainVC = self
     }
     
     private func setupUi() {
@@ -84,6 +88,15 @@ class MainListViewController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         
         profileImage.addTarget(self, action: #selector(profileClicked), for: .touchUpInside)
+        profileImage.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(longTouchProfile)))
+    }
+    
+    @objc private func longTouchProfile(state: UILongPressGestureRecognizer) {
+        if state.state == .ended {
+            viewModel.profileLongTouched()
+            print("long touch")
+        }
+   
     }
     
     private func moveAndResizeImage(for height: CGFloat) {
@@ -115,6 +128,7 @@ class MainListViewController: UIViewController {
     }
     
     @objc private func profileClicked() {
+//        AuthRepository.shared.deleteUser()
         print ("clicked")
     }
     
@@ -182,11 +196,19 @@ extension MainListViewController: UITableViewDataSource {
     
 }
 
-extension MainListViewController: SubscriberDelegate {
+extension MainListViewController: MainNotifier {
     
-    func notify() {
+    func updateData() {
         DispatchQueue.main.async {
             self.listTableView.reloadData()
         }
+    }
+    
+    func openLogin() {
+        profileImage.isHidden = true
+        let loginVC = LoginViewController()
+        navigationController?.viewControllers.removeFirst()
+        (UIApplication.shared.delegate as? AppDelegate)?.window?.rootViewController = loginVC
+//        navigationController?.pushViewController(loginVC, animated: true)
     }
 }

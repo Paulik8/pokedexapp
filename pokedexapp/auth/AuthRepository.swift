@@ -11,6 +11,8 @@ import CoreData
 
 class AuthRepository {
     
+    let entity = "Users"
+    
     static var shared: AuthRepository = {
         let instance = AuthRepository()
         return instance
@@ -18,7 +20,7 @@ class AuthRepository {
     
     func getUser() -> User? {
         let managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>.init(entityName: "Users")
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>.init(entityName: entity)
         do {
             let results = try managedObjectContext.fetch(fetchRequest) as! [NSManagedObject]
             if (results.count == 0) {
@@ -39,8 +41,8 @@ class AuthRepository {
     func saveUser(name: String, password: String) {
         let app = UIApplication.shared.delegate as! AppDelegate
         let context = app.persistentContainer.viewContext
-        let entity = NSEntityDescription.entity(forEntityName: "Users", in: context)
-        let newUser = NSManagedObject(entity: entity!, insertInto: context)
+        let entityToSave = NSEntityDescription.entity(forEntityName: entity, in: context)
+        let newUser = NSManagedObject(entity: entityToSave!, insertInto: context)
         
         newUser.setValue(name, forKey: "name")
         newUser.setValue(password, forKey: "password")
@@ -49,6 +51,18 @@ class AuthRepository {
             try context.save()
         } catch {
             print ("save failed")
+        }
+    }
+    
+    func deleteUser() {
+        let managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        let fetch = NSFetchRequest<NSFetchRequestResult>.init(entityName: entity)
+        let request = NSBatchDeleteRequest(fetchRequest: fetch)
+        
+        do {
+            _ = try managedObjectContext.execute(request)
+        } catch {
+            print ("delete failed")
         }
     }
     

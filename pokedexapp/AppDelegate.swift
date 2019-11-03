@@ -20,8 +20,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let loginVC = LoginViewController()
         window = UIWindow()
         let navigationVC = UINavigationController(rootViewController: loginVC)
-//        navigationVC.navigationBar.setValue(true, forKey: "hidesShadow")
-//        navigationVC.navigationBar.barTintColor = Colors.DEFAULT_BACKGROUND
+        navigationVC.navigationBar.setValue(true, forKey: "hidesShadow")
+        navigationVC.navigationBar.barTintColor = Colors.DEFAULT_BACKGROUND
         window?.rootViewController = navigationVC
         window?.makeKeyAndVisible()
         FirebaseApp.configure()

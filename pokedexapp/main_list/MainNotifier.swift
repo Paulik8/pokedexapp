@@ -8,4 +8,9 @@
 
 import Foundation
 
-
+protocol MainNotifier {
+    
+    func updateData()
+    
+    func openLogin()
+}
