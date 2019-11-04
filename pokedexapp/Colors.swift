@@ -23,7 +23,11 @@ struct Colors {
     static var FIRE = UIColor.orange
     
     static var LEFT_GRADIENT_LOGIN = UIColor(red: 58/255, green: 99/255, blue: 224/255, alpha: 1)
-    static var RIGHT_GRADIENT_LOGIN = UIColor(red: 82/255, green: 171/255, blue: 199/255, alpha: 1)
+    static var RIGHT_GRADIENT_LOGIN = UIColor(red: 82/255, green: 199/255, blue: 199/255, alpha: 1)
+//    static var RIGHT_GRADIENT_LOGIN = UIColor(red: 82/255, green: 171/255, blue: 199/255, alpha: 1)
+    
+    static var LEFT_GRADIENT_LOGIN_PUSH = UIColor(red: 1/255, green: 61/255, blue: 255/255, alpha: 1)
+    static var RIGHT_GRADIENT_LOGIN_PUSH = UIColor(red: 82/255, green: 172/255, blue: 199/255, alpha: 1)
     
     static var LEFT_GRADIENT_SIGNUP = UIColor(red: 41/255, green: 181/255, blue: 36/255, alpha: 1)
 //    static var RIGHT_GRADIENT_SIGNUP = UIColor(red: 255/255, green: 254/255, blue: 2/255, alpha: 1)

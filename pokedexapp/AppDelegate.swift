@@ -9,12 +9,15 @@
 import UIKit
 import CoreData
 import Firebase
+import FirebaseDatabase
+import FirebaseStorage
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    var ref: DatabaseReference!
+    var storage: Storage!
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         let loginVC = LoginViewController()
@@ -25,6 +28,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.rootViewController = navigationVC
         window?.makeKeyAndVisible()
         FirebaseApp.configure()
+        ref = Database.database().reference()
+        storage = Storage.storage(url: "gs://pokedex-f117f.appspot.com")
         // Override point for customization after application launch.
         return true
     }

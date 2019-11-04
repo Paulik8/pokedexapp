@@ -17,7 +17,6 @@ class LoginViewController: AuthViewController {
     var buttonTopAnchor: NSLayoutConstraint?
     var buttonBottomAnchor: NSLayoutConstraint?
     
-    
     var login: AuthLabel = {
         let login = AuthLabel()
         login.text = "Log In"
@@ -47,7 +46,7 @@ class LoginViewController: AuthViewController {
     
     var button: AuthButton = {
         let button = AuthButton()
-        button.frame = CGRect(origin: .zero, size: CGSize(width: 0, height: 64))
+        button.frame = CGRect(origin: .zero, size: CGSize(width: 100, height: 64))
         button.setTitle("Log In", for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.clipsToBounds = true
@@ -82,16 +81,17 @@ class LoginViewController: AuthViewController {
         checkUser()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        buttonDown()
-    }
-    
     private func checkUser() {
         viewModel.checkUser()
     }
     
     override func setupListeners() {
         viewModel.loginVC = self
+        button.addTarget(self, action: #selector(submitTouchDown), for: .touchDown)
+        button.addTarget(self, action: #selector(submitTouchUpInside), for: .touchUpInside)
+        button.addTarget(self, action: #selector(submitTouchUpOutside), for: .touchUpOutside)
+        let tap = UITapGestureRecognizer(target: self, action: #selector(signupClicked))
+        signUp.addGestureRecognizer(tap)
         super.setupListeners()
     }
     
@@ -110,11 +110,21 @@ class LoginViewController: AuthViewController {
         password.setPadding()
     }
     
-    @objc private func submitClicked(sender: AnyObject?) {
-        if (sender === button) {
-            if (handleFields()) {
-                viewModel.handleSubmitClick(name: name.text!, password: password.text!)
-            }
+    @objc private func submitTouchUpInside() {
+        button.replaceLayer(colors: [Colors.LEFT_GRADIENT_LOGIN.cgColor, Colors.RIGHT_GRADIENT_LOGIN.cgColor])
+        
+        if (handleFields()) {
+            viewModel.handleSubmitClick(name: name.text!, password: password.text!)
+        }
+    }
+    
+    @objc private func submitTouchUpOutside() {
+        button.replaceLayer(colors: [Colors.LEFT_GRADIENT_LOGIN.cgColor, Colors.RIGHT_GRADIENT_LOGIN.cgColor])
+    }
+    
+    @objc private func submitTouchDown(event: UIControl) {
+        if event.state == .highlighted {
+            button.replaceLayer(colors: [Colors.LEFT_GRADIENT_LOGIN_PUSH.cgColor, Colors.RIGHT_GRADIENT_LOGIN_PUSH.cgColor])
         }
     }
     
@@ -126,12 +136,12 @@ class LoginViewController: AuthViewController {
     }
     
     @objc private func signupClicked(_ gestureRecognizer: UITapGestureRecognizer) {
-        if gestureRecognizer.state == .ended {
-            let animator = UIViewPropertyAnimator(duration: 0.4, curve: .easeInOut, animations: {
+//        if gestureRecognizer.state == .ended {
+//            let animator = UIViewPropertyAnimator(duration: 0.4, curve: .easeInOut, animations: {
                 self.viewModel.handleSignUpClick()
-           })
-           animator.startAnimation()
-        }
+//           })
+//           animator.startAnimation()
+//        }
     }
     
     private func setupUi() {
@@ -146,10 +156,6 @@ class LoginViewController: AuthViewController {
         activateConstraints()
         recalculateConstraints()
         updateViews()
-        
-        button.addTarget(self, action: #selector(submitClicked), for: .touchUpInside)
-        let tap = UITapGestureRecognizer(target: self, action: #selector(signupClicked))
-        signUp.addGestureRecognizer(tap)
     }
     
     private func updateViews() {
@@ -205,8 +211,9 @@ class LoginViewController: AuthViewController {
         view.layoutIfNeeded()
     }
     
+    
+    
     override func buttonUp(height: CGFloat) {
-        view.frame.origin.y += 0.01
         buttonBottomAnchor?.isActive = false
         topVerticalAnchor?.constant -= height/3
         buttonTopAnchor?.constant = 24
@@ -225,6 +232,7 @@ class LoginViewController: AuthViewController {
         view.setNeedsLayout()
         view.layoutIfNeeded()
     }
+    
     
 }
 
@@ -261,5 +269,15 @@ extension UIView {
             guard let item = layer.sublayers?[0] else { return }
             layer.replaceSublayer(item, with: gradient)
         }
+    }
+    
+    func replaceLayer(colors: [CGColor]) {
+        let gradient = CAGradientLayer()
+        gradient.frame = bounds
+        gradient.colors = colors
+        gradient.startPoint = CGPoint(x: 0, y: 0.5)
+        gradient.endPoint = CGPoint(x: 1, y: 0.5)
+        guard let item = layer.sublayers?[0] else { return }
+        layer.replaceSublayer(item, with: gradient)
     }
 }

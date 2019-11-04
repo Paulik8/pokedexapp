@@ -9,10 +9,17 @@
 import UIKit
 
 class AuthViewController: UIViewController {
+    
+    let authViewModel = AuthViewModel()
 
     override func viewDidLoad() {
         hideKeyboardAnywhereClicked()
+        authViewModel.vc = self
         super.viewDidLoad()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        authViewModel.submitButtonDowm()
     }
     
     func hideKeyboardAnywhereClicked() {
@@ -26,21 +33,11 @@ class AuthViewController: UIViewController {
     
     @objc func keyboardWillShow(notification: NSNotification) {
         guard let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue else { return }
-        if (view.frame.origin.y == 0) {
-            let height = keyboardSize.height
-            buttonUp(height: height)
-        }
+        authViewModel.keyboardWillShow(keyboardSize: keyboardSize)
     }
     
     @objc func keyboardWillHide(notification: NSNotification) {
-            view.frame.origin.y = 0
-            buttonDown()
-    }
-    
-    func buttonUp(height: CGFloat) {
-    }
-    
-    func buttonDown() {
+        authViewModel.keyboardWillHide() 
     }
     
     func setupListeners() {
@@ -48,4 +45,14 @@ class AuthViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
 
+}
+
+extension AuthViewController: AuthNotifier {
+    
+    @objc func buttonUp(height: CGFloat) {
+    }
+    
+    @objc func buttonDown() {
+    }
+    
 }
