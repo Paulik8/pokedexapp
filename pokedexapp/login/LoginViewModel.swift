@@ -19,13 +19,18 @@ class LoginViewModel {
     func checkUser() {
         DispatchQueue.main.async {
             guard let userData = AuthRepository.shared.getUser() else { return }
-            self.user = userData
-            self.loginVC?.successLogin()
+            self.signInUser(name: userData.name!, password: userData.password!)
         }
     }
     
     func handleSubmitClick(name: String, password: String) {
-        let email = name.trimmingCharacters(in: .whitespaces).lowercased() + addition
+        DispatchQueue.main.async {
+            self.signInUser(name: name, password: password)
+        }
+    }
+    
+    private func signInUser(name: String, password: String) {
+        let email = convertNameToEmail(name)
         Auth.auth().signIn(withEmail: email, password: password) { (user, err) in
             if (user != nil) {
                 self.saveUser(email: email, password: password)
@@ -34,17 +39,27 @@ class LoginViewModel {
     }
     
     private func saveUser(email: String, password: String) {
-        let index = email.count - addition.count
-        let name = String(email.prefix(index))
-        DispatchQueue.main.async {
-            AuthRepository.shared.saveUser(name: name, password: password)
-            self.checkUser()
-            self.loginVC?.successLogin()
+        let name = convertEmailToName(email)
+        if (self.user == nil) {
+            self.user = User(name: name, password: password)
+        } else {
+            self.user?.name = name
+            self.user?.password = password
         }
+        AuthRepository.shared.saveUser(name: name, password: password) // Need some result to check one?
+        self.loginVC?.successLogin()
     }
     
     func handleSignUpClick() {
         loginVC?.openSignUp()
     }
     
+    private func convertNameToEmail(_  name: String) -> String { // Think of something(protocol, superclass)
+        return name.trimmingCharacters(in: .whitespaces).lowercased() + addition
+    }
+    
+    private func convertEmailToName(_ email: String) -> String { // Think of something(protocol, superclass)
+        let index = email.count - addition.count
+        return String(email.prefix(index))
+    }
 }

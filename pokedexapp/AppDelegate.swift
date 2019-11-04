@@ -29,7 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
         FirebaseApp.configure()
         ref = Database.database().reference()
-        storage = Storage.storage(url: "gs://pokedex-f117f.appspot.com")
+        storage = Storage.storage()
         // Override point for customization after application launch.
         return true
     }

@@ -9,6 +9,8 @@
 import UIKit
 
 class MainListViewController: UIViewController {
+    
+    let logoImageUrl = "https://firebasestorage.googleapis.com/v0/b/pokedex-f117f.appspot.com/o/logo%2Flogo.png?alt=media&token=71179a3c-735c-4fdb-b04a-7ad627c81186"
 
     private var viewModel = MainViewModel()
     private let navigationTitle = "Pokemons"
@@ -70,7 +72,11 @@ class MainListViewController: UIViewController {
         title = navigationTitle
         
         profileImage = UIButton()
-        profileImage.setImage(#imageLiteral(resourceName: "profile"), for: .normal)
+        let imageView = UIImageView()
+        imageView.loadImageFromUrl(logoImageUrl) {
+            self.profileImage.setImage(imageView.image, for: .normal) // is this right?
+        }
+//        profileImage.setImage(#imageLiteral(resourceName: "profile"), for: .normal)
         profileImage.imageView?.contentMode = .scaleAspectFill
         guard let navBar = navigationController?.navigationBar else { return }
         navBar.addSubview(profileImage)
@@ -99,7 +105,7 @@ class MainListViewController: UIViewController {
    
     }
     
-    private func moveAndResizeImage(for height: CGFloat) {
+    private func moveAndResizeImage(for height: CGFloat) { // viewModel or viewController
         let coeff: CGFloat = {
             let delta = height - NavigationConstants.NavBarHeightSmallState
             let heightDifferenceBetweenStates = (NavigationConstants.NavBarHeightLargeState - NavigationConstants.NavBarHeightSmallState)
