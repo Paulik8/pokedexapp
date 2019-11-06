@@ -10,9 +10,9 @@ import UIKit
 
 struct NavigationConstants {
     
-    static let ImageSizeForLargeState: CGFloat = 80
+    static let ImageSizeForLargeState: CGFloat = 70 //was 80
     static let ImageRightMargin: CGFloat = 12
-    static let ImageTopMarginForLargeState: CGFloat = 12
+    static let ImageTopMarginForLargeState: CGFloat = 20 //  was 12
 //    static let ImageBottomMarginForSmallState: CGFloat = 6
     static let ImageSizeForSmallState: CGFloat = 32
     static let NavBarHeightSmallState: CGFloat = 44

@@ -32,26 +32,23 @@ class SignupViewModel {
             }
             guard let uid = result?.user.uid else { return } // Need uid in local database?
             
-            let img: UIImage = #imageLiteral(resourceName: "pika") // default image profile photo
-            let name = "pikachu.png"
+//            guard let uploadData = img.pngData() else { return }
             
-            guard let uploadData = img.pngData() else { return }
-            
-            let logoStorage = app?.storage.reference().child("logo").child("logo.png")
+//            let logoStorage = app?.storage.reference().child("logo").child("logo.png")
 //            storage?.putData(uploadData, metadata: nil, completion: { (metadata, err) in
 //                if let storageError = err {
 //                    print(storageError)
 //                    return
 //                }
 
-            logoStorage?.downloadURL(completion: { (url, err) in
-                if let urlError = err {
-                    print(urlError)
-                    return
-                }
-                guard let imageUrl = url else { return }
+//            logoStorage?.downloadURL(completion: { (url, err) in
+//                if let urlError = err {
+//                    print(urlError)
+//                    return
+//                }
+//                guard let imageUrl = url else { return }
             
-                ref?.child("users").child(uid).setValue(["name": email, "password": password, "imageUrl": imageUrl.absoluteString], withCompletionBlock: { (err, ref) in
+            ref?.child("users").child(uid).setValue(["name": email, "password": password, "imageUrl": ""], withCompletionBlock: { (err, ref) in
                     if let dbErr = err {
                         print (dbErr)
                         return
@@ -60,7 +57,7 @@ class SignupViewModel {
                     self.signupVC?.successSignup()
                 })
                 
-            })
+//            })
                 
 //            }) //
             
@@ -71,12 +68,13 @@ class SignupViewModel {
     private func saveUser(email: String, password: String) {
         let name = convertEmailToName(email)
         if (self.userData == nil) { // extra because should clear user after log out
-            self.userData = User(name: name, password: password)
+            self.userData = User(name: name, password: password, imageUrl: "")
         } else {
             self.userData?.name = name
             self.userData?.password = password
+            self.userData?.imageUrl = ""
         }
-        AuthRepository.shared.saveUser(name: name, password: password) // Need some result to check one?
+        AuthRepository.shared.saveUser(name: name, password: password, imageUrl: "") // Need some result to check one?
     }
 
     private func convertNameToEmail(_  name: String) -> String { // Think of something(protocol, superclass)

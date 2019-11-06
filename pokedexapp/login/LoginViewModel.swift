@@ -19,7 +19,18 @@ class LoginViewModel {
     func checkUser() {
         DispatchQueue.main.async {
             guard let userData = AuthRepository.shared.getUser() else { return }
-            self.signInUser(name: userData.name!, password: userData.password!)
+            let name = userData.name
+            let password = userData.password
+            let imageUrl = userData.imageUrl
+            if (self.user == nil) {
+                self.user = User(name: name, password: password, imageUrl: imageUrl)
+            } else {
+                self.user?.name = name
+                self.user?.password = password
+                self.user?.imageUrl = imageUrl
+            }
+            self.loginVC?.successLogin()
+//            self.signInUser(name: userData.name!, password: userData.password!)
         }
     }
     
@@ -31,22 +42,31 @@ class LoginViewModel {
     
     private func signInUser(name: String, password: String) {
         let email = convertNameToEmail(name)
-        Auth.auth().signIn(withEmail: email, password: password) { (user, err) in
-            if (user != nil) {
-                self.saveUser(email: email, password: password)
+        Auth.auth().signIn(withEmail: email, password: password) { (res , err) in
+            if (res != nil) {
+                let ref = (UIApplication.shared.delegate as? AppDelegate)?.ref
+                guard let uid = res?.user.uid  else { return }
+                ref?.child("users").child(uid).observeSingleEvent(of: .value, with: { (snapshot) in
+                    let value = snapshot.value as? NSDictionary
+                    let name = value?["name"] as? String
+                    let password = value?["password"] as? String
+                    let imageUrl = value?["imageUrl"] as? String ?? ""
+                    self.saveUser(email: name!, password: password!, imageUrl: imageUrl)
+                })
             }
         }
     }
     
-    private func saveUser(email: String, password: String) {
+    private func saveUser(email: String, password: String, imageUrl: String) {
         let name = convertEmailToName(email)
         if (self.user == nil) {
-            self.user = User(name: name, password: password)
+            self.user = User(name: name, password: password, imageUrl: imageUrl)
         } else {
             self.user?.name = name
             self.user?.password = password
+            self.user?.imageUrl = imageUrl
         }
-        AuthRepository.shared.saveUser(name: name, password: password) // Need some result to check one?
+        AuthRepository.shared.saveUser(name: name, password: password, imageUrl: imageUrl) // Need some result to check one?
         self.loginVC?.successLogin()
     }
     

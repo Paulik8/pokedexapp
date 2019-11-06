@@ -37,6 +37,10 @@ class MainViewModel: Notifier {
         mainVC?.openLogin()
     }
     
+    func profileClicked() {
+        mainVC?.openProfile()
+    }
+    
     //start Notifier
     
     func notifyData(_ data: Any?) {

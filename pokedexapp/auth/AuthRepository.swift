@@ -12,6 +12,7 @@ import CoreData
 class AuthRepository {
     
     let entity = "Users"
+    private var isProfileLogo = false
     
     static var shared: AuthRepository = {
         let instance = AuthRepository()
@@ -30,6 +31,7 @@ class AuthRepository {
             var user = User()
             user.name = data.value(forKey: "name") as? String
             user.password = data.value(forKey: "password") as? String
+            user.imageUrl = data.value(forKey: "imageUrl") as? String
             return user
         } catch {
             print ("request failed")
@@ -38,7 +40,7 @@ class AuthRepository {
         
     }
     
-    func saveUser(name: String, password: String) {
+    func saveUser(name: String, password: String, imageUrl: String) {
         let app = UIApplication.shared.delegate as! AppDelegate
         let context = app.persistentContainer.viewContext
         let entityToSave = NSEntityDescription.entity(forEntityName: entity, in: context)
@@ -46,6 +48,7 @@ class AuthRepository {
         
         newUser.setValue(name, forKey: "name")
         newUser.setValue(password, forKey: "password")
+        newUser.setValue(imageUrl, forKey: "imageUrl")
         
         do {
             try context.save()
@@ -64,6 +67,18 @@ class AuthRepository {
         } catch {
             print ("delete failed")
         }
+    }
+    
+    func changeProfileLogo() {
+        
+    }
+    
+    func getProfileLogoStatus() -> Bool {
+        return isProfileLogo
+    }
+    
+    func setProfileLogoStatus(status: Bool) {
+        isProfileLogo = status
     }
     
 }

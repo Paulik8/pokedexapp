@@ -45,7 +45,7 @@ class MainListViewController: UIViewController {
     
     private func setupUi() {
         listTableView = {
-            let table = UITableView(frame: .zero)
+            let table = UITableView(frame: .zero, style: .plain)
             table.translatesAutoresizingMaskIntoConstraints = false
             table.estimatedRowHeight = UITableView.automaticDimension
             table.delegate = self
@@ -61,22 +61,19 @@ class MainListViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             listTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 8),
-            listTableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            listTableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             listTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -8),
-            listTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -8)
+            listTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
             ])
         
     }
     
     private func setupNavigationBar() {
         title = navigationTitle
-        
         profileImage = UIButton()
-        let imageView = UIImageView()
-        imageView.loadImageFromUrl(logoImageUrl) {
-            self.profileImage.setImage(imageView.image, for: .normal) // is this right?
+        if (!AuthRepository.shared.getProfileLogoStatus()) {
+            profileImage.setImage(#imageLiteral(resourceName: "logo"), for: .normal)
         }
-//        profileImage.setImage(#imageLiteral(resourceName: "profile"), for: .normal)
         profileImage.imageView?.contentMode = .scaleAspectFill
         guard let navBar = navigationController?.navigationBar else { return }
         navBar.addSubview(profileImage)
@@ -122,7 +119,7 @@ class MainListViewController: UIViewController {
         let sizeDiff = NavigationConstants.ImageSizeForLargeState * (1.0 - factor)
         
         let y: CGFloat = {
-            let y = (1 - scale) * NavigationConstants.ImageSizeForLargeState
+            let y = (1 - scale) * (NavigationConstants.ImageSizeForLargeState + NavigationConstants.ImageTopMarginForLargeState)
             return max (0, y)
         }()
 
@@ -134,7 +131,7 @@ class MainListViewController: UIViewController {
     }
     
     @objc private func profileClicked() {
-//        AuthRepository.shared.deleteUser()
+        viewModel.profileClicked()
         print ("clicked")
     }
     
@@ -215,6 +212,11 @@ extension MainListViewController: MainNotifier {
         let loginVC = LoginViewController()
         navigationController?.viewControllers.removeFirst()
         (UIApplication.shared.delegate as? AppDelegate)?.window?.rootViewController = loginVC
-//        navigationController?.pushViewController(loginVC, animated: true)
+    }
+    
+    func openProfile() {
+        let profileVC = ProfileViewController()
+        profileVC.modalPresentationStyle = .formSheet
+        present(profileVC, animated: true, completion: nil)
     }
 }

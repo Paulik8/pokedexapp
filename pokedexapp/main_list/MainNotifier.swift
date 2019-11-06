@@ -13,4 +13,6 @@ protocol MainNotifier {
     func updateData()
     
     func openLogin()
+    
+    func openProfile()
 }

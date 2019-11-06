@@ -12,6 +12,7 @@ struct User {
     
     var name: String?
     var password: String?
+    var imageUrl: String?
     
 //    init(name: String, password: String) {
 //        self.name = name

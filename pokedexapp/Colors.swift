@@ -12,6 +12,7 @@ struct Colors {
     
     static var DEFAULT_BACKGROUND = UIColor.white
     static var TYPELABEL_TEXT = UIColor.white
+    static var STRIP = UIColor(red: 225/255, green: 225/255, blue: 225/255, alpha: 1)
     
     static var DEFAULT_TEXT_COLOR = UIColor.black
     static var DEFAULT_TEXTFIELD_BACKGROUND = UIColor(red: 201/255, green: 201/255, blue: 201/255, alpha: 1)

@@ -45,7 +45,7 @@ class SignupViewController: AuthViewController {
     
     var repeatPassword: AuthTextField = {
         let repeatPassword = AuthTextField()
-        repeatPassword.placeholder = "Repeat password"
+        repeatPassword.placeholder = "Confirm password"
         repeatPassword.translatesAutoresizingMaskIntoConstraints = false
         repeatPassword.sizeToFit()
         repeatPassword.clipsToBounds = true
