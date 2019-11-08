@@ -38,16 +38,28 @@ class LoginViewController: AuthViewController {
     var password: AuthTextField = {
         let password = AuthTextField()
         password.placeholder = "Password"
+        password.isSecureTextEntry = true
         password.translatesAutoresizingMaskIntoConstraints = false
         password.sizeToFit()
         password.clipsToBounds = true
         return password
     }()
     
+    var passwordEye: UIButton =  {
+        let img = UIButton()
+        img.frame = CGRect(x: 0, y: 0, width: 24, height: 24)
+        img.setImage(UIImage(named: "eye")?.withRenderingMode(.alwaysTemplate), for: .normal)
+        img.setImageColor(color: .lightGray)
+        img.clipsToBounds = true
+        img.translatesAutoresizingMaskIntoConstraints = false
+        return img
+    }()
+    
     var button: AuthButton = {
         let button = AuthButton()
         button.frame = CGRect(origin: .zero, size: CGSize(width: 100, height: 64))
         button.setTitle("Log In", for: .normal)
+        button.setTitle("Logging in", for: .disabled)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.clipsToBounds = true
         return button
@@ -87,12 +99,44 @@ class LoginViewController: AuthViewController {
     
     override func setupListeners() {
         viewModel.loginVC = self
+        
         button.addTarget(self, action: #selector(submitTouchDown), for: .touchDown)
         button.addTarget(self, action: #selector(submitTouchUpInside), for: .touchUpInside)
         button.addTarget(self, action: #selector(submitTouchUpOutside), for: .touchUpOutside)
+        
+        passwordEye.addTarget(self, action: #selector(passwordEyeTouchDown), for: .touchDown)
+        passwordEye.addTarget(self, action: #selector(passwordEyeTouchUpInside), for: .touchUpInside)
+        passwordEye.addTarget(self, action: #selector(passwordEyeTouchUpOutside), for: .touchUpOutside)
+        
         let tap = UITapGestureRecognizer(target: self, action: #selector(signupClicked))
         signUp.addGestureRecognizer(tap)
         super.setupListeners()
+    }
+    
+    @objc private func passwordEyeTouchDown() {
+        if (password.isSecureTextEntry) {
+            passwordEye.setImageColor(color: .gray)
+        } else {
+            passwordEye.setImageColor(color: Colors.DARK_BLUE)
+        } 
+    }
+    
+    @objc private func passwordEyeTouchUpInside() {
+        if (password.isSecureTextEntry) {
+            password.isSecureTextEntry = false
+            passwordEye.setImageColor(color: Colors.WATER)
+        } else {
+            password.isSecureTextEntry = true
+            passwordEye.setImageColor(color: .lightGray)
+        }
+    }
+    
+    @objc private func passwordEyeTouchUpOutside() {
+       if (password.isSecureTextEntry) {
+            passwordEye.setImageColor(color: .lightGray)
+        } else {
+            passwordEye.setImageColor(color: Colors.WATER)
+        }
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -100,7 +144,6 @@ class LoginViewController: AuthViewController {
             self.updateViews()
             self.recalculateConstraints()
         }
-        
     }
     
     private func updateLoginFields() {
@@ -114,6 +157,8 @@ class LoginViewController: AuthViewController {
         button.replaceLayer(colors: [Colors.LEFT_GRADIENT_LOGIN.cgColor, Colors.RIGHT_GRADIENT_LOGIN.cgColor])
         
         if (handleFields()) {
+            dismissKeyboard()
+            button.disableButton()
             viewModel.handleSubmitClick(name: name.text!, password: password.text!)
         }
     }
@@ -129,7 +174,7 @@ class LoginViewController: AuthViewController {
     }
     
     private func handleFields() -> Bool {
-        if (name.hasText || password.hasText || !(name.text?.trimmingCharacters(in: .whitespaces).isEmpty)! || (password.text?.trimmingCharacters(in: .whitespaces).isEmpty)!) {
+        if (name.hasText || password.hasText || !(name.text?.trimmingCharacters(in: .whitespaces).isEmpty)! || !(password.text?.trimmingCharacters(in: .whitespaces).isEmpty)!) {
             return true
         }
         return false
@@ -137,10 +182,7 @@ class LoginViewController: AuthViewController {
     
     @objc private func signupClicked(_ gestureRecognizer: UITapGestureRecognizer) {
 //        if gestureRecognizer.state == .ended {
-//            let animator = UIViewPropertyAnimator(duration: 0.4, curve: .easeInOut, animations: {
-                self.viewModel.handleSignUpClick()
-//           })
-//           animator.startAnimation()
+            viewModel.handleSignUpClick()
 //        }
     }
     
@@ -152,6 +194,7 @@ class LoginViewController: AuthViewController {
         view.addSubview(preSignUp)
         view.addSubview(signUp)
         view.addSubview(button)
+        view.addSubview(passwordEye)
         
         activateConstraints()
         recalculateConstraints()
@@ -189,6 +232,12 @@ class LoginViewController: AuthViewController {
             password.trailingAnchor.constraint(equalTo: name.trailingAnchor),
             password.heightAnchor.constraint(equalToConstant: password.frame.height),
             
+            passwordEye.topAnchor.constraint(equalTo: password.topAnchor),
+            passwordEye.bottomAnchor.constraint(equalTo: password.bottomAnchor, constant: -4),
+            passwordEye.trailingAnchor.constraint(equalTo: password.trailingAnchor, constant: -4),
+            passwordEye.widthAnchor.constraint(equalToConstant: passwordEye.frame.width),
+            passwordEye.heightAnchor.constraint(equalToConstant: passwordEye.frame.height),
+            
             preSignUp.topAnchor.constraint(lessThanOrEqualTo: password.bottomAnchor, constant: 24),
             preSignUp.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: width),
             
@@ -199,6 +248,7 @@ class LoginViewController: AuthViewController {
             button.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -40),
             buttonBottomAnchor!,
             button.heightAnchor.constraint(equalToConstant: button.frame.height)
+
         ])
     }
     
@@ -210,8 +260,6 @@ class LoginViewController: AuthViewController {
         view.setNeedsLayout()
         view.layoutIfNeeded()
     }
-    
-    
     
     override func buttonUp(height: CGFloat) {
         buttonBottomAnchor?.isActive = false
@@ -233,7 +281,6 @@ class LoginViewController: AuthViewController {
         view.layoutIfNeeded()
     }
     
-    
 }
 
 extension LoginViewController: LoginNotifier {
@@ -241,6 +288,7 @@ extension LoginViewController: LoginNotifier {
     //start LoginNotifier
     
     func successLogin() {
+        button.enableButton()
         let homeVC = MainListViewController()
         let appDelegate = UIApplication.shared.delegate as? AppDelegate
         appDelegate?.window?.rootViewController = UINavigationController(rootViewController: homeVC)
@@ -250,6 +298,13 @@ extension LoginViewController: LoginNotifier {
         let signUpVC = SignupViewController()
         signUpVC.modalPresentationStyle = .fullScreen
         navigationController?.pushViewController(signUpVC, animated: true)
+    }
+    
+    func showError(error str: String) {
+        button.enableButton()
+        let alert = UIAlertController(title: str, message: nil, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
     
     //end LoginNotifier
@@ -280,4 +335,12 @@ extension UIView {
         guard let item = layer.sublayers?[0] else { return }
         layer.replaceSublayer(item, with: gradient)
     }
+}
+
+extension UIButton {
+    
+    func setImageColor(color: UIColor) {
+        imageView?.tintColor = color
+    }
+    
 }

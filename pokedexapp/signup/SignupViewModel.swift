@@ -14,6 +14,7 @@ class SignupViewModel {
     var addition = "@gmail.com"
     var signupVC: SignupNotifier?
     var userData: User?
+    let errorHandler = ErrorHandler()
     
     func handleSubmitClick(name: String, password: String) {
         let email = convertNameToEmail(name)
@@ -27,6 +28,8 @@ class SignupViewModel {
         let ref = app?.ref
         Auth.auth().createUser(withEmail: email, password: password) { (result, err) in
             if let userError = err {
+                let errorStr = self.errorHandler.handleAuthError(error: userError)
+                self.signupVC?.showError(error: errorStr)
                 print(userError)
                 return
             }

@@ -14,4 +14,6 @@ protocol LoginNotifier {
     
     func openSignUp()
     
+    func showError(error str: String)
+    
 }

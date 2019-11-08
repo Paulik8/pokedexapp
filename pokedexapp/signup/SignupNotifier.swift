@@ -9,5 +9,9 @@
 import UIKit
 
 protocol SignupNotifier {
+    
     func successSignup()
+    
+    func showError(error str: String)
+    
 }

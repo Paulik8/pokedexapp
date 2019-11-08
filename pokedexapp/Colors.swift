@@ -34,6 +34,8 @@ struct Colors {
 //    static var RIGHT_GRADIENT_SIGNUP = UIColor(red: 255/255, green: 254/255, blue: 2/255, alpha: 1)
     static var RIGHT_GRADIENT_SIGNUP = UIColor(red: 233/255, green: 213/255, blue: 30/255, alpha: 1)
     
+    static var DARK_BLUE = UIColor(red: 0, green: 0, blue: 55, alpha: 1)
+    
 }
 //найти узкое место системы если p11 = p22
 //найти область значений лямбда при которых система будет work

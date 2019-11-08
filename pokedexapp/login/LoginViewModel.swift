@@ -15,6 +15,7 @@ class LoginViewModel {
     let addition = "@gmail.com"
     var user: User?
     var loginVC: LoginNotifier?
+    let errHandler = ErrorHandler()
     
     func checkUser() {
         DispatchQueue.main.async {
@@ -43,6 +44,12 @@ class LoginViewModel {
     private func signInUser(name: String, password: String) {
         let email = convertNameToEmail(name)
         Auth.auth().signIn(withEmail: email, password: password) { (res , err) in
+            if (err != nil) {
+                let errorStr = self.errHandler.handleAuthError(error: err)
+                self.loginVC?.showError(error: errorStr)
+                print(err)
+                return
+            }
             if (res != nil) {
                 let ref = (UIApplication.shared.delegate as? AppDelegate)?.ref
                 guard let uid = res?.user.uid  else { return }

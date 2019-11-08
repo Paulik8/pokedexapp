@@ -191,4 +191,10 @@ extension SignupViewController: SignupNotifier {
         appDelegate?.window?.rootViewController = UINavigationController(rootViewController: homeVC)
     }
     
+    func showError(error str: String) {
+        let alert = UIAlertController(title: str, message: nil, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
+    }
+    
 }
