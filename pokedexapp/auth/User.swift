@@ -7,16 +7,18 @@
 //
 
 import Foundation
+import RealmSwift
 
-struct User {
+class User: Object {
     
-    var name: String?
-    var password: String?
-    var imageUrl: String?
+    @objc dynamic var name: String = ""
+    @objc dynamic var password: String = ""
+    @objc dynamic var imageUrl: String = ""
     
-//    init(name: String, password: String) {
-//        self.name = name
-//        self.password = password
-//    }
-    
+    convenience init(name: String, password: String, imageUrl: String) {
+        self.init()
+        self.name = name
+        self.password = password
+        self.imageUrl = imageUrl
+    }
 }

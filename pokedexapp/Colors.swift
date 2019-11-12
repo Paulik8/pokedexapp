@@ -25,17 +25,16 @@ struct Colors {
     
     static var LEFT_GRADIENT_LOGIN = UIColor(red: 58/255, green: 99/255, blue: 224/255, alpha: 1)
     static var RIGHT_GRADIENT_LOGIN = UIColor(red: 82/255, green: 199/255, blue: 199/255, alpha: 1)
-//    static var RIGHT_GRADIENT_LOGIN = UIColor(red: 82/255, green: 171/255, blue: 199/255, alpha: 1)
     
     static var LEFT_GRADIENT_LOGIN_PUSH = UIColor(red: 1/255, green: 61/255, blue: 255/255, alpha: 1)
     static var RIGHT_GRADIENT_LOGIN_PUSH = UIColor(red: 82/255, green: 172/255, blue: 199/255, alpha: 1)
     
     static var LEFT_GRADIENT_SIGNUP = UIColor(red: 41/255, green: 181/255, blue: 36/255, alpha: 1)
-//    static var RIGHT_GRADIENT_SIGNUP = UIColor(red: 255/255, green: 254/255, blue: 2/255, alpha: 1)
     static var RIGHT_GRADIENT_SIGNUP = UIColor(red: 233/255, green: 213/255, blue: 30/255, alpha: 1)
+    
+    static var LEFT_GRADIENT_SIGNUP_PUSH = UIColor(red: 36/255, green: 182/255, blue: 104/255, alpha: 1)
+    static var RIGHT_GRADIENT_SIGNUP_PUSH = UIColor(red: 233/255, green: 172/255, blue: 30/255, alpha: 1)
     
     static var DARK_BLUE = UIColor(red: 0, green: 0, blue: 55, alpha: 1)
     
 }
-//найти узкое место системы если p11 = p22
-//найти область значений лямбда при которых система будет work

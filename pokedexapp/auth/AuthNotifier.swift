@@ -14,4 +14,8 @@ protocol AuthNotifier {
     
     func buttonDown()
     
+    func buttonUpSmallScreen()
+    
+    func buttonUpMediumScreen()
+    
 }

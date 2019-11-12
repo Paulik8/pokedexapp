@@ -11,6 +11,7 @@ import CoreData
 import Firebase
 import FirebaseDatabase
 import FirebaseStorage
+import RealmSwift
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -18,18 +19,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     var ref: DatabaseReference!
     var storage: Storage!
+    var realm: Realm?
 
+    func initializeRealm() {
+        realm = try! Realm()
+    }
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        let loginVC = LoginViewController()
         window = UIWindow()
-        let navigationVC = UINavigationController(rootViewController: loginVC)
-        navigationVC.navigationBar.setValue(true, forKey: "hidesShadow")
-        navigationVC.navigationBar.barTintColor = Colors.DEFAULT_BACKGROUND
-        window?.rootViewController = navigationVC
-        window?.makeKeyAndVisible()
+        initializeRealm()
+        let loginVC = LoginViewController()
+        let navigationVC = LoginNavigationController(rootViewController: loginVC)
         FirebaseApp.configure()
         ref = Database.database().reference()
         storage = Storage.storage()
+        window?.rootViewController = navigationVC
+        window?.makeKeyAndVisible()
         // Override point for customization after application launch.
         return true
     }

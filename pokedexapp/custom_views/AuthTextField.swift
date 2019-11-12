@@ -58,17 +58,4 @@ extension UITextField {
         self.leftViewMode = .always
     }
     
-    func setIcon(_ image: UIImage) {
-       let iconView = UIImageView(frame:
-                      CGRect(x: 0, y: 0, width: 30, height: 30))
-       iconView.image = image
-        iconView.image?.withRenderingMode(.alwaysTemplate)
-        iconView.image?.withTintColor(.red)
-       let iconContainerView: UIView = UIView(frame:
-                      CGRect(x: 0, y: 0, width: 30, height: 30))
-        iconContainerView.addSubview(iconView)
-       rightView = iconContainerView
-       rightViewMode = .always
-    }
-    
 }

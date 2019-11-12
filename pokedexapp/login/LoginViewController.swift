@@ -35,29 +35,18 @@ class LoginViewController: AuthViewController {
         return name
     }()
     
-    var password: AuthTextField = {
-        let password = AuthTextField()
+    var password: PasswordTextField = {
+        let password = PasswordTextField()
+        password.textContentType = .password
         password.placeholder = "Password"
-        password.isSecureTextEntry = true
         password.translatesAutoresizingMaskIntoConstraints = false
         password.sizeToFit()
         password.clipsToBounds = true
         return password
     }()
     
-    var passwordEye: UIButton =  {
-        let img = UIButton()
-        img.frame = CGRect(x: 0, y: 0, width: 24, height: 24)
-        img.setImage(UIImage(named: "eye")?.withRenderingMode(.alwaysTemplate), for: .normal)
-        img.setImageColor(color: .lightGray)
-        img.clipsToBounds = true
-        img.translatesAutoresizingMaskIntoConstraints = false
-        return img
-    }()
-    
     var button: AuthButton = {
         let button = AuthButton()
-        button.frame = CGRect(origin: .zero, size: CGSize(width: 100, height: 64))
         button.setTitle("Log In", for: .normal)
         button.setTitle("Logging in", for: .disabled)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -77,7 +66,6 @@ class LoginViewController: AuthViewController {
     
     var signUp: UILabel = {
         let signup = UILabel()
-        signup.isUserInteractionEnabled = true
         signup.textColor = Colors.WATER
         signup.text = "Sign Up"
         signup.sizeToFit()
@@ -85,6 +73,8 @@ class LoginViewController: AuthViewController {
         signup.translatesAutoresizingMaskIntoConstraints = false
         return signup
     }()
+    
+    var signUpTap: UITapGestureRecognizer?
 
     override func viewDidLoad() {
         setupUi()
@@ -104,39 +94,10 @@ class LoginViewController: AuthViewController {
         button.addTarget(self, action: #selector(submitTouchUpInside), for: .touchUpInside)
         button.addTarget(self, action: #selector(submitTouchUpOutside), for: .touchUpOutside)
         
-        passwordEye.addTarget(self, action: #selector(passwordEyeTouchDown), for: .touchDown)
-        passwordEye.addTarget(self, action: #selector(passwordEyeTouchUpInside), for: .touchUpInside)
-        passwordEye.addTarget(self, action: #selector(passwordEyeTouchUpOutside), for: .touchUpOutside)
-        
-        let tap = UITapGestureRecognizer(target: self, action: #selector(signupClicked))
-        signUp.addGestureRecognizer(tap)
+        signUpTap = UITapGestureRecognizer(target: self, action: #selector(signupClicked))
+        signUp.isUserInteractionEnabled = true
+        signUp.addGestureRecognizer(signUpTap!)
         super.setupListeners()
-    }
-    
-    @objc private func passwordEyeTouchDown() {
-        if (password.isSecureTextEntry) {
-            passwordEye.setImageColor(color: .gray)
-        } else {
-            passwordEye.setImageColor(color: Colors.DARK_BLUE)
-        } 
-    }
-    
-    @objc private func passwordEyeTouchUpInside() {
-        if (password.isSecureTextEntry) {
-            password.isSecureTextEntry = false
-            passwordEye.setImageColor(color: Colors.WATER)
-        } else {
-            password.isSecureTextEntry = true
-            passwordEye.setImageColor(color: .lightGray)
-        }
-    }
-    
-    @objc private func passwordEyeTouchUpOutside() {
-       if (password.isSecureTextEntry) {
-            passwordEye.setImageColor(color: .lightGray)
-        } else {
-            passwordEye.setImageColor(color: Colors.WATER)
-        }
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -194,18 +155,19 @@ class LoginViewController: AuthViewController {
         view.addSubview(preSignUp)
         view.addSubview(signUp)
         view.addSubview(button)
-        view.addSubview(passwordEye)
         
         activateConstraints()
         recalculateConstraints()
         updateViews()
+        
     }
     
     private func updateViews() {
         let colors = [Colors.LEFT_GRADIENT_LOGIN.cgColor, Colors.RIGHT_GRADIENT_LOGIN.cgColor]
         button.backgroundGradient(colors: colors)
         updateLoginFields()
-        
+        button.setupIndicator()
+        password.setupEls(view: view)
     }
     
     private func activateConstraints() {
@@ -232,12 +194,6 @@ class LoginViewController: AuthViewController {
             password.trailingAnchor.constraint(equalTo: name.trailingAnchor),
             password.heightAnchor.constraint(equalToConstant: password.frame.height),
             
-            passwordEye.topAnchor.constraint(equalTo: password.topAnchor),
-            passwordEye.bottomAnchor.constraint(equalTo: password.bottomAnchor, constant: -4),
-            passwordEye.trailingAnchor.constraint(equalTo: password.trailingAnchor, constant: -4),
-            passwordEye.widthAnchor.constraint(equalToConstant: passwordEye.frame.width),
-            passwordEye.heightAnchor.constraint(equalToConstant: passwordEye.frame.height),
-            
             preSignUp.topAnchor.constraint(lessThanOrEqualTo: password.bottomAnchor, constant: 24),
             preSignUp.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: width),
             
@@ -257,6 +213,24 @@ class LoginViewController: AuthViewController {
         let reserveTop = view.bounds.height / 16
         topVerticalAnchor?.constant = topAnchor
         buttonBottomAnchor?.constant = -reserveTop
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+    }
+    
+    override func buttonUpSmallScreen() {
+        buttonBottomAnchor?.isActive = false
+        topVerticalAnchor?.constant = 0
+        buttonTopAnchor?.constant = 24
+        buttonTopAnchor?.isActive = true
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+    }
+    
+    override func buttonUpMediumScreen() {
+        buttonBottomAnchor?.isActive = false
+        topVerticalAnchor?.constant = 16
+        buttonTopAnchor?.constant = 24
+        buttonTopAnchor?.isActive = true
         view.setNeedsLayout()
         view.layoutIfNeeded()
     }
@@ -281,9 +255,13 @@ class LoginViewController: AuthViewController {
         view.layoutIfNeeded()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        viewModel.unsubscribe()
+    }
+    
 }
 
-extension LoginViewController: LoginNotifier {
+extension LoginViewController: LoginNotifier, PasswordClickListener {
     
     //start LoginNotifier
     
@@ -308,6 +286,37 @@ extension LoginViewController: LoginNotifier {
     }
     
     //end LoginNotifier
+    
+    //start PasswordClickListener
+    
+    func touchDown() {
+        if (password.isSecureTextEntry) {
+            password.changeIconColor(color: .gray)
+        } else {
+            password.changeIconColor(color: Colors.DARK_BLUE)
+        }
+    }
+    
+    func touchUpInside() {
+        if (password.isSecureTextEntry) {
+            password.isSecureTextEntry = false
+            password.changeIconColor(color: Colors.WATER)
+        } else {
+            password.isSecureTextEntry = true
+            password.changeIconColor(color: .lightGray)
+        }
+    }
+    
+    func touchUpOutside() {
+        if (password.isSecureTextEntry) {
+            password.changeIconColor(color: .lightGray)
+        } else {
+            password.changeIconColor(color: Colors.WATER)
+        }
+    }
+    
+    //end PasswordClickListener
+    
 }
 
 extension UIView {
@@ -337,10 +346,3 @@ extension UIView {
     }
 }
 
-extension UIButton {
-    
-    func setImageColor(color: UIColor) {
-        imageView?.tintColor = color
-    }
-    
-}

@@ -8,6 +8,7 @@
 
 import Foundation
 import FirebaseAuth
+import RealmSwift
 
 class SignupViewModel {
     
@@ -15,12 +16,11 @@ class SignupViewModel {
     var signupVC: SignupNotifier?
     var userData: User?
     let errorHandler = ErrorHandler()
+    var notification: NotificationToken?
     
     func handleSubmitClick(name: String, password: String) {
         let email = convertNameToEmail(name)
-        DispatchQueue.main.async {
-            self.signUp(email: email, password: password)
-        }
+        signUp(email: email, password: password)
     }
     
     private func signUp(email: String, password: String) {
@@ -57,7 +57,6 @@ class SignupViewModel {
                         return
                     }
                     self.saveUser(email: email, password: password) // should update attributes in local database table "users"
-                    self.signupVC?.successSignup()
                 })
                 
 //            })
@@ -77,7 +76,25 @@ class SignupViewModel {
             self.userData?.password = password
             self.userData?.imageUrl = ""
         }
-        AuthRepository.shared.saveUser(name: name, password: password, imageUrl: "") // Need some result to check one?
+        let rep = AuthRepository.shared
+        rep.saveUser(name: name, password: password, imageUrl: "") // Need some result to check one?
+        notification = rep.dbRef?.objects(User.self).observe { (changes) in
+            switch changes {
+            case .initial:
+                break
+            case .update(let results, let deletions, let insertions, let modifications):
+                if (insertions.count == 1) {
+                    self.signupVC?.successSignup()
+                }
+            case .error(let error):
+                print ("error")
+                fatalError("\(error)")
+            }
+        }
+    }
+    
+    func unsubscribe() {
+        notification?.invalidate()
     }
 
     private func convertNameToEmail(_  name: String) -> String { // Think of something(protocol, superclass)

@@ -9,36 +9,44 @@
 import UIKit
 import FirebaseAuth
 import FirebaseDatabase
+import RealmSwift
 
 class LoginViewModel {
     
     let addition = "@gmail.com"
     var user: User?
+//    {
+//        didSet {
+//            self.loginVC?.successLogin()
+//        }
+//    }
+    private var notification: NotificationToken?
+    
     var loginVC: LoginNotifier?
     let errHandler = ErrorHandler()
     
     func checkUser() {
-        DispatchQueue.main.async {
-            guard let userData = AuthRepository.shared.getUser() else { return }
-            let name = userData.name
-            let password = userData.password
-            let imageUrl = userData.imageUrl
-            if (self.user == nil) {
-                self.user = User(name: name, password: password, imageUrl: imageUrl)
-            } else {
-                self.user?.name = name
-                self.user?.password = password
-                self.user?.imageUrl = imageUrl
-            }
-            self.loginVC?.successLogin()
-//            self.signInUser(name: userData.name!, password: userData.password!)
+        let rep = AuthRepository.shared
+        guard let userData = rep.getUser() else { return }
+        let name = userData.name
+        let password = userData.password
+        let imageUrl = userData.imageUrl
+        if (self.user == nil) {
+            self.user = User(name: name, password: password, imageUrl: imageUrl)
+        } else {
+            self.user?.name = name
+            self.user?.password = password
+            self.user?.imageUrl = imageUrl
         }
+        self.loginVC?.successLogin()
     }
     
     func handleSubmitClick(name: String, password: String) {
-        DispatchQueue.main.async {
-            self.signInUser(name: name, password: password)
-        }
+        
+//        saveUser(email: convertNameToEmail(name), password: password, imageUrl: "")
+//        DispatchQueue.main.async {
+        signInUser(name: name, password: password)
+//        }
     }
     
     private func signInUser(name: String, password: String) {
@@ -73,12 +81,29 @@ class LoginViewModel {
             self.user?.password = password
             self.user?.imageUrl = imageUrl
         }
-        AuthRepository.shared.saveUser(name: name, password: password, imageUrl: imageUrl) // Need some result to check one?
-        self.loginVC?.successLogin()
+        let rep = AuthRepository.shared
+        rep.saveUser(name: name, password: password, imageUrl: imageUrl)
+        notification = rep.dbRef?.objects(User.self).observe { (changes) in
+            switch changes {
+            case .initial:
+                break
+            case .update(let results, let deletions, let insertions, let modifications):
+                if (insertions.count == 1) {
+                    self.loginVC?.successLogin()
+                }
+            case .error(let error):
+                print ("error")
+                fatalError("\(error)")
+            }
+        }
     }
     
     func handleSignUpClick() {
         loginVC?.openSignUp()
+    }
+    
+    func unsubscribe() {
+        notification?.invalidate()
     }
     
     private func convertNameToEmail(_  name: String) -> String { // Think of something(protocol, superclass)

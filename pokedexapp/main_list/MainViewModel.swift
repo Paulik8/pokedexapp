@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import RealmSwift
 
 class MainViewModel: Notifier {
     
@@ -16,6 +17,7 @@ class MainViewModel: Notifier {
             mainVC!.updateData()
         }
     }
+    var notification: NotificationToken?
     var service = Service()
     var converter = MainConverter()
     
@@ -32,13 +34,34 @@ class MainViewModel: Notifier {
         return service.charCheck(name: name)
     }
     
+//    func getProfileLogoUrl() -> String? {
+//        
+//    }
+    
     func profileLongTouched() {
-        AuthRepository.shared.deleteUser()
-        mainVC?.openLogin()
+        let rep = AuthRepository.shared
+        rep.deleteUser()
+        notification = rep.dbRef?.objects(User.self).observe({ (changes) in
+            switch changes {
+            case .initial:
+                break
+            case .update(let results, let deletions, let insertions, let modifications):
+                if (deletions.count == 1) {
+                    self.mainVC?.openLogin()
+                }
+            case .error(let error):
+                print ("error")
+                fatalError("\(error)")
+            }
+        })
     }
     
     func profileClicked() {
         mainVC?.openProfile()
+    }
+    
+    func unsubscribe() {
+        notification?.invalidate()
     }
     
     //start Notifier

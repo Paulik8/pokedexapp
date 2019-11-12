@@ -70,7 +70,14 @@ class MainListViewController: UIViewController {
     
     private func setupNavigationBar() {
         title = navigationTitle
+        navigationController?.navigationBar.prefersLargeTitles = true
+        setupProfileLogo()
+    }
+    
+    private func setupProfileLogo() {
         profileImage = UIButton()
+        
+//        let profileUrl = 
         if (!AuthRepository.shared.getProfileLogoStatus()) {
             profileImage.setImage(#imageLiteral(resourceName: "logo"), for: .normal)
         }
@@ -88,8 +95,6 @@ class MainListViewController: UIViewController {
             profileImage.heightAnchor.constraint(equalToConstant: profileImage.frame.height),
             profileImage.widthAnchor.constraint(equalToConstant: profileImage.frame.height)
         ])
-        navigationController?.navigationBar.prefersLargeTitles = true
-        
         profileImage.addTarget(self, action: #selector(profileClicked), for: .touchUpInside)
         profileImage.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(longTouchProfile)))
     }
@@ -97,7 +102,6 @@ class MainListViewController: UIViewController {
     @objc private func longTouchProfile(state: UILongPressGestureRecognizer) {
         if state.state == .ended {
             viewModel.profileLongTouched()
-            print("long touch")
         }
    
     }
@@ -132,12 +136,15 @@ class MainListViewController: UIViewController {
     
     @objc private func profileClicked() {
         viewModel.profileClicked()
-        print ("clicked")
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         guard let height = navigationController?.navigationBar.frame.height else { return }
         moveAndResizeImage(for: height)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        viewModel.unsubscribe()
     }
 
 }
@@ -211,7 +218,7 @@ extension MainListViewController: MainNotifier {
         profileImage.isHidden = true
         let loginVC = LoginViewController()
         navigationController?.viewControllers.removeFirst()
-        (UIApplication.shared.delegate as? AppDelegate)?.window?.rootViewController = loginVC
+        (UIApplication.shared.delegate as? AppDelegate)?.window?.rootViewController = LoginNavigationController(rootViewController: loginVC)
     }
     
     func openProfile() {

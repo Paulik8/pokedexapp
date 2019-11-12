@@ -13,6 +13,7 @@ class AuthViewController: UIViewController {
     let authViewModel = AuthViewModel()
 
     override func viewDidLoad() {
+        authViewModel.getDeviceSize()
         hideKeyboardAnywhereClicked()
         authViewModel.vc = self
         super.viewDidLoad()
@@ -53,6 +54,14 @@ extension AuthViewController: AuthNotifier {
     }
     
     @objc func buttonDown() {
+    }
+    
+    @objc func buttonUpSmallScreen() {
+        
+    }
+    
+    @objc func buttonUpMediumScreen() {
+        
     }
     
 }

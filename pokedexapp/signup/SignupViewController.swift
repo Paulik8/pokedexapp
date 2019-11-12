@@ -34,8 +34,9 @@ class SignupViewController: AuthViewController {
         return name
     }()
     
-    var password: AuthTextField = {
-        let password = AuthTextField()
+    var password: PasswordTextField = {
+        let password = PasswordTextField()
+        password.textContentType = .newPassword
         password.placeholder = "Password"
         password.translatesAutoresizingMaskIntoConstraints = false
         password.sizeToFit()
@@ -43,8 +44,9 @@ class SignupViewController: AuthViewController {
         return password
     }()
     
-    var repeatPassword: AuthTextField = {
-        let repeatPassword = AuthTextField()
+    var repeatPassword: PasswordTextField = {
+        let repeatPassword = PasswordTextField()
+        repeatPassword.textContentType = .newPassword
         repeatPassword.placeholder = "Confirm password"
         repeatPassword.translatesAutoresizingMaskIntoConstraints = false
         repeatPassword.sizeToFit()
@@ -54,8 +56,8 @@ class SignupViewController: AuthViewController {
     
     var button: AuthButton = {
         let button = AuthButton()
-        button.frame = CGRect(origin: .zero, size: CGSize(width: 0, height: 64))
         button.setTitle("Sign Up", for: .normal)
+        button.setTitle("Signing Up", for: .disabled)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.clipsToBounds = true
         return button
@@ -73,6 +75,11 @@ class SignupViewController: AuthViewController {
     
     override func setupListeners() {
         viewModel.signupVC = self
+        
+        button.addTarget(self, action: #selector(buttonTouchDown), for: .touchDown)
+        button.addTarget(self, action: #selector(buttonTouchUpInside), for: .touchUpInside)
+        button.addTarget(self, action: #selector(buttonTouchUpOutside), for: .touchUpOutside)
+        
         super.setupListeners()
     }
     
@@ -89,16 +96,28 @@ class SignupViewController: AuthViewController {
         view.layoutIfNeeded()
         updateViews()
         
-        button.addTarget(self, action: #selector(submitClicked), for: .touchUpInside)
+        
         
     }
     
-    @objc private func submitClicked(sender: AnyObject?) {
-        if (sender === button) {
-            if (handleFields()) {
-                viewModel.handleSubmitClick(name: name.text!, password: password.text!)
-            }
+    @objc private func buttonTouchDown(event: UIControl) {
+        if (event.state == .highlighted) {
+            button.replaceLayer(colors: [Colors.LEFT_GRADIENT_SIGNUP_PUSH.cgColor, Colors.RIGHT_GRADIENT_SIGNUP_PUSH.cgColor])
         }
+    }
+    
+    @objc private func buttonTouchUpInside() {
+        button.replaceLayer(colors: [Colors.LEFT_GRADIENT_SIGNUP.cgColor, Colors.RIGHT_GRADIENT_SIGNUP.cgColor])
+        
+        if (handleFields()) {
+            dismissKeyboard()
+            button.disableButton()
+            viewModel.handleSubmitClick(name: name.text!, password: password.text!)
+        }
+    }
+    
+    @objc private func buttonTouchUpOutside() {
+        button.replaceLayer(colors: [Colors.LEFT_GRADIENT_SIGNUP.cgColor, Colors.RIGHT_GRADIENT_SIGNUP.cgColor])
     }
     
     private func handleFields() -> Bool {
@@ -112,6 +131,9 @@ class SignupViewController: AuthViewController {
         let colors = [Colors.LEFT_GRADIENT_SIGNUP.cgColor, Colors.RIGHT_GRADIENT_SIGNUP.cgColor]
         button.backgroundGradient(colors: colors)
         updateFields()
+        button.setupIndicator()
+        password.setupEls(view: view)
+        repeatPassword.setupEls(view: view)
     }
     
     private func updateFields() {
@@ -161,9 +183,26 @@ class SignupViewController: AuthViewController {
     }
     
     override func buttonUp(height: CGFloat) {
-        view.frame.origin.y += 0.01
         buttonBottomAnchor?.isActive = false
         topVerticalAnchor?.constant -= height/3
+        buttonTopAnchor?.constant = 24
+        buttonTopAnchor?.isActive = true
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+    }
+    
+    override func buttonUpSmallScreen() {
+        buttonBottomAnchor?.isActive = false
+        topVerticalAnchor?.constant = 0
+        buttonTopAnchor?.constant = 24
+        buttonTopAnchor?.isActive = true
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+    }
+    
+    override func buttonUpMediumScreen() {
+        buttonBottomAnchor?.isActive = false
+        topVerticalAnchor?.constant = 16
         buttonTopAnchor?.constant = 24
         buttonTopAnchor?.isActive = true
         view.setNeedsLayout()
@@ -181,11 +220,18 @@ class SignupViewController: AuthViewController {
         view.layoutIfNeeded()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        viewModel.unsubscribe()
+    }
+    
 }
 
-extension SignupViewController: SignupNotifier {
+extension SignupViewController: SignupNotifier, PasswordClickListener {
+    
+    //start SignupNotifier
     
     func successSignup() {
+        button.enableButton()
         let homeVC = MainListViewController()
         let appDelegate = UIApplication.shared.delegate as? AppDelegate
         appDelegate?.window?.rootViewController = UINavigationController(rootViewController: homeVC)
@@ -196,5 +242,23 @@ extension SignupViewController: SignupNotifier {
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
     }
+    
+    //end SignupNotifier
+    
+    //start PasswordClickListener
+    
+    func touchDown() {
+        
+    }
+    
+    func touchUpInside() {
+        
+    }
+    
+    func touchUpOutside() {
+        
+    }
+    
+    //end PasswordClickListener
     
 }

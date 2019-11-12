@@ -20,12 +20,29 @@ class AuthButton: UIButton {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        if (UIDevice.modelName == "Simulator iPhone SE") {
+            self.frame = CGRect(origin: .zero, size: CGSize(width: 100, height: 44))
+            self.layer.cornerRadius = 18
+        } else {
+            self.frame = CGRect(origin: .zero, size: CGSize(width: 100, height: 64))
+            self.layer.cornerRadius = 30
+        }
         setupUi()
     }
     
-   private func setupUi() {
+    private func setupUi() {
         setTitleColor(UIColor.white, for: .normal)
-        layer.cornerRadius = 30
+    }
+    
+    func setupIndicator() {
+        self.addSubview(indicator)
+            
+        let leadingConstant = frame.width / 4
+        
+        NSLayoutConstraint.activate([
+            indicator.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: leadingConstant),
+            indicator.centerYAnchor.constraint(equalTo: self.centerYAnchor)
+        ])
     }
     
     required init?(coder: NSCoder) {
@@ -34,16 +51,6 @@ class AuthButton: UIButton {
     
     func disableButton() {
         isEnabled = false
-        self.addSubview(indicator)
-        
-        let leadingConstant = frame.width / 4
-        
-        NSLayoutConstraint.activate([
-            indicator.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: leadingConstant),
-//            indicator.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -trailingConstant),
-            indicator.centerYAnchor.constraint(equalTo: self.centerYAnchor)
-        ])
-        
         let newLayer = CALayer()
         newLayer.frame = bounds
         newLayer.backgroundColor = UIColor.white.withAlphaComponent(0.2).cgColor
