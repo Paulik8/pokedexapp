@@ -12,11 +12,12 @@ import RealmSwift
 class MainViewModel: Notifier {
     
     var mainVC: MainNotifier?
-    var pokemons: Pokemon? {
-        didSet {
-            mainVC!.updateData()
-        }
-    }
+    var pokemons: Pokemon?
+//    {
+//        didSet {
+//            mainVC!.updateData()
+//        }
+//    }
     var notification: NotificationToken?
     var service = Service()
     var converter = MainConverter()
@@ -68,9 +69,9 @@ class MainViewModel: Notifier {
     
     func notifyData(_ data: Any?) {
         pokemons = data as? Pokemon
+        mainVC?.updateData()
     }
     
     //end
- 
     
 }

@@ -10,6 +10,7 @@ import UIKit
 
 class InfoViewController: UIViewController {
     
+    let transitionDelegate: UIViewControllerTransitioningDelegate = TransitionDelegate()
     var viewModel = InfoViewModel()
     var pokemonName: String? {
         didSet {
@@ -91,11 +92,29 @@ class InfoViewController: UIViewController {
     
     private func setupListeners() {
         viewModel.subscriber = self
+        let tap = UITapGestureRecognizer(target: self, action: #selector(containerClicked))
+        container.addGestureRecognizer(tap)
+    }
+    
+    @objc private func containerClicked() {
+        let rateVC = RateViewController()
+
+//        rateVC.modalPresentationStyle = .formSheet
+        rateVC.updateBundle(id: viewModel.pokemonInfo!.id)
+//        self.transitioningDelegate = transitionDelegate
+        rateVC.transitioningDelegate = self
+        rateVC.modalPresentationStyle = .custom
+        self.present(rateVC, animated: true, completion: nil)
+//        rateVC.view.frame = CGRect(x: 0, y: 0, width: 400, height: 600)
+        
+//        present(rateVC, animated: true, completion: nil)
+//        rateVC.view.frame = CGRect(x: 0, y: rateVC.view.frame.height * 0.7, width: rateVC.view.bounds.width, height: rateVC.view.frame.height * 0.3)
+//        rateVC.view.clipsToBounds = true
     }
 
 }
 
-extension InfoViewController: SubscriberDelegate {
+extension InfoViewController: SubscriberDelegate, UIViewControllerTransitioningDelegate {
     
     func notify() {
         
@@ -110,4 +129,22 @@ extension InfoViewController: SubscriberDelegate {
             }
         }
     }
+    
+    func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
+        return HalfSizePresentationController(presentedViewController: presented, presenting: presentingViewController)
+    }
+    
+}
+
+class HalfSizePresentationController : UIPresentationController {
+    
+    override var frameOfPresentedViewInContainerView: CGRect {
+           guard let container = containerView else { return .zero }
+           
+        return CGRect(x: 0, y: 150, width: container.bounds.width, height: container.bounds.height - 150)
+       }
+    
+//    func frameOfPresentedViewInContainerView() -> CGRect {
+//        return CGRect(x: 0, y: containerView!.bounds.height/2, width: (containerView?.bounds.width)!, height: (containerView?.bounds.height)!/2)
+//    }
 }
