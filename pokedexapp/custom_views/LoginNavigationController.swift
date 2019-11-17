@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 class LoginNavigationController: UINavigationController {
     
@@ -14,6 +15,22 @@ class LoginNavigationController: UINavigationController {
         navigationBar.setValue(true, forKey: "hidesShadow")
         navigationBar.barTintColor = Colors.DEFAULT_BACKGROUND
         super.viewDidLoad()
+    }
+    
+}
+
+extension UIHostingController {
+    
+    func setBlurView() {
+        // Init a UIVisualEffectView which going to do the blur for us
+        let blurView = UIVisualEffectView()
+        // Make its frame equal the main view frame so that every pixel is under blurred
+        blurView.frame = view.frame
+        // Choose the style of the blur effect to regular.
+        // You can choose dark, light, or extraLight if you wants
+        blurView.effect = UIBlurEffect(style: .regular)
+        // Now add the blur view to the main view
+        view.addSubview(blurView)
     }
     
 }

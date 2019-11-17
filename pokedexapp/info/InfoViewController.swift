@@ -7,9 +7,11 @@
 //
 
 import UIKit
+import SwiftUI
 
 class InfoViewController: UIViewController {
     
+    var hostVC: UIHostingController<RateView>!
     let transitionDelegate: UIViewControllerTransitioningDelegate = TransitionDelegate()
     var viewModel = InfoViewModel()
     var pokemonName: String? {
@@ -96,15 +98,50 @@ class InfoViewController: UIViewController {
         container.addGestureRecognizer(tap)
     }
     
+    func setBlurView() {
+        // Init a UIVisualEffectView which going to do the blur for us
+        let blurView = UIVisualEffectView()
+        // Make its frame equal the main view frame so that every pixel is under blurred
+        blurView.frame = view.frame
+        // Choose the style of the blur effect to regular.
+        // You can choose dark, light, or extraLight if you wants
+        blurView.effect = UIBlurEffect(style: .regular)
+        // Now add the blur view to the main view
+        view.addSubview(blurView)
+    }
+    
     @objc private func containerClicked() {
-        let rateVC = RateViewController()
-
+        let clearVC = ClearViewController()
+        clearVC.setBundle(id: viewModel.pokemonInfo!.id)
+//        rateVC.transitioningDelegate = self
+        clearVC.modalPresentationStyle = .overFullScreen
+        
+        present(clearVC, animated: false) {
+            UIView.animate(withDuration: 0.4) {
+                clearVC.view?.backgroundColor = UIColor(white: -1, alpha: 0.5)
+            }
+        }
+//            let hostVC = RateHostingViewController(rootView: RateView(id: viewModel.pokemonInfo!.id))
+//            hostVC.view?.backgroundColor = UIColor.clear
+//            hostVC.modalPresentationStyle = .overFullScreen
+//            present(hostVC, animated: true, completion: nil)
+//        hostVC.setBlurView()
+//        self.setBlurView()
+//        navigationController?.setBlurView()
+//        present(hostVC, animated: true)
+        
+        
+//            UIView.animate(withDuration: 4) {
+//                hostVC.view?.backgroundColor = UIColor(white: -1, alpha: 0.5)
+//            }
+//        {
+        
 //        rateVC.modalPresentationStyle = .formSheet
-        rateVC.updateBundle(id: viewModel.pokemonInfo!.id)
+//        rateVC.updateBundle(id: viewModel.pokemonInfo!.id)
 //        self.transitioningDelegate = transitionDelegate
-        rateVC.transitioningDelegate = self
-        rateVC.modalPresentationStyle = .custom
-        self.present(rateVC, animated: true, completion: nil)
+//        rateVC.transitioningDelegate = self
+//        rateVC.modalPresentationStyle = .custom
+//        self.present(rateVC, animated: true, completion: nil)
 //        rateVC.view.frame = CGRect(x: 0, y: 0, width: 400, height: 600)
         
 //        present(rateVC, animated: true, completion: nil)
@@ -117,7 +154,7 @@ class InfoViewController: UIViewController {
 extension InfoViewController: SubscriberDelegate, UIViewControllerTransitioningDelegate {
     
     func notify() {
-        
+
         DispatchQueue.main.async {
             if let data = self.viewModel.pokemonInfo {
                 self.height.elementValue.text = "\(data.height)"
@@ -136,12 +173,64 @@ extension InfoViewController: SubscriberDelegate, UIViewControllerTransitioningD
     
 }
 
+final class RateHostingViewController: UIHostingController<RateView> {
+    
+    var clearVC: ClearNotifier?
+    
+    override init(rootView: RateView) {
+        super.init(rootView: rootView)
+        setListener()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+//        UIView.animate(withDuration: 1) {
+//            self.view.backgroundColor = UIColor(white: -1, alpha: 0.5)
+//        }
+    }
+    
+    @objc required dynamic init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setListener() {
+//        let tap = UITapGestureRecognizer(target: self, action: #selector(tapped))
+//        self.view.addGestureRecognizer(tap)
+        
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touch = touches.first
+        let touchPoint = touch?.location(in: self.view)
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touch = touches.first
+        let touchPoint = touch?.location(in: self.view)
+        guard let point = touchPoint else { return }
+        guard let rootViewTopInset = rootView.topInset else { return }
+        if (point.y < rootViewTopInset) {
+            tapped()
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        
+    }
+    
+    private func tapped() {
+        dismiss(animated: true)
+        clearVC?.dismiss()
+    }
+    
+}
+
 class HalfSizePresentationController : UIPresentationController {
     
     override var frameOfPresentedViewInContainerView: CGRect {
            guard let container = containerView else { return .zero }
+        let offsetY: CGFloat = 400
            
-        return CGRect(x: 0, y: 150, width: container.bounds.width, height: container.bounds.height - 150)
+        return CGRect(x: 0, y: offsetY, width: container.bounds.width, height: container.bounds.height - offsetY)
        }
     
 //    func frameOfPresentedViewInContainerView() -> CGRect {

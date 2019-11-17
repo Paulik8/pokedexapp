@@ -7,12 +7,13 @@
 //
 
 import UIKit
+import SwiftUI
 
 class RateViewController: UIViewController {
 
     var transitionDelegate: UIViewControllerTransitioningDelegate!
-    var updated = false
     let collectionIdentifier = "rateCollection"
+    
     let viewModel = RateViewModel()
     lazy var collectionView: UICollectionView = {
         let colLayout = UICollectionViewFlowLayout()
@@ -38,6 +39,7 @@ class RateViewController: UIViewController {
         super.viewDidLoad()
         setupUi()
         print ("keklik", view.frame)
+        
 //        setupListeners()
 //        viewModel.loadEvolution()
     }
