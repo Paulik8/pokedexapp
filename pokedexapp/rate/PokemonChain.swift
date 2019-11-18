@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import RealmSwift
 
 // MARK: - PokemonChain
 struct PokemonChain: Codable {

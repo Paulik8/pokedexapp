@@ -240,6 +240,7 @@ class LoginViewController: AuthViewController {
         topVerticalAnchor?.constant -= height/3
         buttonTopAnchor?.constant = 24
         buttonTopAnchor?.isActive = true
+        print ("keklik", self, view)
         view.setNeedsLayout()
         view.layoutIfNeeded()
     }
