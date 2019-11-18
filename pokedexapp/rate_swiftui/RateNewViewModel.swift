@@ -13,7 +13,7 @@ import Combine
 
 class RateNewViewModel: ObservableObject {
     
-//    let didChange = PassthroughSubject<RateNewViewModel, Never>()
+    let imageUrl: String = "https://img.pokemondb.net/artwork/"
     let didChange = ObservableObjectPublisher()
     var notification: NotificationToken?
     let app = (UIApplication.shared).delegate as? AppDelegate
@@ -24,7 +24,8 @@ class RateNewViewModel: ObservableObject {
     }
     var pokemonStats: PokemonStats? {
         didSet {
-            self.name = (self.pokemonStats?.stats[0].stat!.name)!
+            self.name = imageUrl + "bulbasaur.jpg"
+//            self.name = (self.pokemonStats?.stats[0].stat!.name)!
         }
     }
     @Published var name: String = ""

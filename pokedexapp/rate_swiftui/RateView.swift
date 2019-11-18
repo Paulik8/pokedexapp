@@ -24,23 +24,58 @@ struct RateView: View {
     
     var body: some View {
         updateViewModel()
-        return VStack  {
-            Text("Your score is \(viewModel.name)")
-            Button(action: {
-                self.viewModel.name = "keklik"
-            }) {
-                Text("Change name")
+        return ZStack {
+            VStack {
+                ImageView(withURL: viewModel.name).padding(.bottom, 30)
+                ZStack(alignment: .bottom) {
+                    Capsule().frame(width: 30, height: 200)
+                    Capsule().frame(width: 30, height: 100).foregroundColor(.white)
+                }
             }
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
+            .background(SwiftUI.Color.orange)
+            .cornerRadius(30)
+            .padding(EdgeInsets(top: topInset!, leading: 0, bottom: 0, trailing: 0))
+            
+            
+            
+//            Button(action: {
+//                self.viewModel.name = "keklik"
+//            }) {
+//                Text("Change name")
+//            }
         }
+        .edgesIgnoringSafeArea(.all)
+        
+//        .animation(.spring())
             
 //        Text(viewModel.pokemonStats?.stats[0].stat?.name ?? "kek")
-//            Card(text: "\(viewModel?.pokemonStats?.id)")
-//            .edgesIgnoringSafeArea(.all)
-//            .padding(EdgeInsets(top: topInset!, leading: 0, bottom: 0, trailing: 0))
+        
 //        }
 //        .onDisappear(perform: {
 //            self.viewModel.removeObservable()
 //        })
+    }
+}
+
+struct ImageView: View {
+    @ObservedObject var imageLoader:ImageLoader
+    @State var image:UIImage = UIImage()
+
+    init(withURL url:String) {
+        imageLoader = ImageLoader(urlString:url)
+    }
+
+    var body: some View {
+        VStack {
+            Image(uiImage: image)
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(width:200, height:200)
+            .cornerRadius(100)
+        }.onReceive(imageLoader.didChange) { data in
+            self.image = UIImage(data: data) ?? UIImage()
+        }
     }
 }
 
