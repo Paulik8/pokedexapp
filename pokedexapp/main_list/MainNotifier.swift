@@ -12,6 +12,8 @@ protocol MainNotifier {
     
     func updateData()
     
+    func updateRow(row: Int)
+    
     func openLogin()
     
     func openProfile()

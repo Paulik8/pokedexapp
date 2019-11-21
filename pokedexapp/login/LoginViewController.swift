@@ -120,7 +120,9 @@ class LoginViewController: AuthViewController {
         if (handleFields()) {
             dismissKeyboard()
             button.disableButton()
-            viewModel.handleSubmitClick(name: name.text!, password: password.text!)
+            viewModel.handleSubmitClick(name: name.text!, password: password.text!) {
+                self.button.enableButton()
+            }
         }
     }
     
@@ -240,7 +242,6 @@ class LoginViewController: AuthViewController {
         topVerticalAnchor?.constant -= height/3
         buttonTopAnchor?.constant = 24
         buttonTopAnchor?.isActive = true
-        print ("keklik", self, view)
         view.setNeedsLayout()
         view.layoutIfNeeded()
     }
@@ -267,7 +268,6 @@ extension LoginViewController: LoginNotifier, PasswordClickListener {
     //start LoginNotifier
     
     func successLogin() {
-        button.enableButton()
         let homeVC = MainListViewController()
         let appDelegate = UIApplication.shared.delegate as? AppDelegate
         appDelegate?.window?.rootViewController = UINavigationController(rootViewController: homeVC)

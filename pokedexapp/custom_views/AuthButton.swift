@@ -56,6 +56,7 @@ class AuthButton: UIButton {
         newLayer.backgroundColor = UIColor.white.withAlphaComponent(0.2).cgColor
         guard let index = layer.sublayers?.count else { return }
         layer.insertSublayer(newLayer, at: UInt32(index))
+        print("keklikButton", self.layer.sublayers?.count)
         indicator.startAnimating()
     }
     

@@ -41,19 +41,20 @@ class LoginViewModel {
         self.loginVC?.successLogin()
     }
     
-    func handleSubmitClick(name: String, password: String) {
+    func handleSubmitClick(name: String, password: String, _ handler: @escaping () -> Void) {
         
 //        saveUser(email: convertNameToEmail(name), password: password, imageUrl: "")
 //        DispatchQueue.main.async {
-        signInUser(name: name, password: password)
+        signInUser(name: name, password: password, handler)
 //        }
     }
     
-    private func signInUser(name: String, password: String) {
+    private func signInUser(name: String, password: String, _ handler: @escaping () -> Void) {
         let email = convertNameToEmail(name)
         Auth.auth().signIn(withEmail: email, password: password) { (res , err) in
             if (err != nil) {
                 let errorStr = self.errHandler.handleAuthError(error: err)
+                handler()
                 self.loginVC?.showError(error: errorStr)
                 print(err)
                 return
@@ -66,13 +67,13 @@ class LoginViewModel {
                     let name = value?["name"] as? String
                     let password = value?["password"] as? String
                     let imageUrl = value?["imageUrl"] as? String ?? ""
-                    self.saveUser(email: name!, password: password!, imageUrl: imageUrl)
+                    self.saveUser(email: name!, password: password!, imageUrl: imageUrl, handler)
                 })
             }
         }
     }
     
-    private func saveUser(email: String, password: String, imageUrl: String) {
+    private func saveUser(email: String, password: String, imageUrl: String, _ handler: @escaping () -> Void) {
         let name = convertEmailToName(email)
         if (self.user == nil) {
             self.user = User(name: name, password: password, imageUrl: imageUrl)
@@ -89,6 +90,7 @@ class LoginViewModel {
                 break
             case .update(let results, let deletions, let insertions, let modifications):
                 if (insertions.count == 1) {
+                    handler()
                     self.loginVC?.successLogin()
                 }
             case .error(let error):

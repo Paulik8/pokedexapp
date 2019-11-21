@@ -12,7 +12,10 @@ import RealmSwift
 class MainViewModel: Notifier {
     
     var mainVC: MainNotifier?
-    var pokemons: Pokemon?
+    let converter = MainConverter()
+    let repository = MainPokemonRepository.shared
+    var pokemonImages = [Int:UIImage]()
+    var pokemons: [PokemonData]?
 //    {
 //        didSet {
 //            mainVC!.updateData()
@@ -20,7 +23,6 @@ class MainViewModel: Notifier {
 //    }
     var notification: NotificationToken?
     var service = Service()
-    var converter = MainConverter()
     
     init() {
         service.viewModel = self
@@ -28,7 +30,30 @@ class MainViewModel: Notifier {
     }
     
     func createRequest() {
+        if let pokemons = repository.getPokemons() {
+            self.pokemons = pokemons
+            mainVC?.updateData()
+        }
         service.getPokemons()
+    }
+    
+    func fetchPokemons(indexOf: Int, isImportant priority: Bool) {
+        guard let pokes = pokemons else { return }
+        guard let sprites = pokes[indexOf].sprites else { return }
+        guard let imageUrl = sprites.large else { return }
+        service.fetchWithDataTask(imageUrl, priority) {
+            print("keklik", indexOf, priority)
+            let image = UIImage(data: $0)
+            self.pokemonImages[indexOf] = image
+            self.mainVC?.updateRow(row: indexOf)
+        }
+    }
+    
+    func cancelFetchPokemons(indexOf: Int) {
+        guard let pokes = pokemons else { return }
+        guard let sprites = pokes[indexOf].sprites else { return }
+        guard let imageUrl = sprites.large else { return }
+        service.cancelFetch(imageUrl)
     }
     
     func checkCharsName(name: String) -> String {
@@ -68,7 +93,12 @@ class MainViewModel: Notifier {
     //start Notifier
     
     func notifyData(_ data: Any?) {
-        pokemons = data as? Pokemon
+        pokemons = data as? [PokemonData]
+        guard let pokemons = self.pokemons else {
+            mainVC?.updateData()
+            return
+        }
+        repository.savePokemons(data: pokemons)
         mainVC?.updateData()
     }
     

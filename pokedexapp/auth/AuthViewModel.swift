@@ -15,8 +15,8 @@ class AuthViewModel {
     let model = UIDevice.modelName
     var deviceSize: String?
     
-    func submitButtonDowm() {
-        vc?.buttonDown()
+    func checkKeyboardState() {
+        keyboardWillHide()
     }
     
     func keyboardWillShow(keyboardSize: CGRect) {

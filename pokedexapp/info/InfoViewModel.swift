@@ -13,47 +13,47 @@ class InfoViewModel: Notifier {
     
     let imageUrl: String = "https://img.pokemondb.net/artwork/"
     let dbRef = ((UIApplication.shared.delegate) as? AppDelegate)?.realm
+    let repository = PokemonInfoRepository.shared
     var subscriber: SubscriberDelegate?
     var service = Service()
-    var pokemonInfo: PokemonInfo? {
-        didSet {
-            self.subscriber!.notify()
-            self.savePokemonStats()
-        }
-    }
+    var pokemonInfo: PokemonStats?
+    var pokemonChain: [Int:PokemonStats]?
+//    {
+//        didSet {
+//            
+//        }
+//    }
     var poster = UIImageView()
     
     init() {
         service.viewModel = self
     }
     
-    func createRequest(name: String) {
+    func createRequest(name: String, id: Int) {
+        if let dbObject = repository.getPokemonInfo(byId: id) {
+            self.pokemonInfo = dbObject
+            subscriber?.notify()
+        }
         service.getInfoPokemon(name: name)
         poster.loadImageFromUrl(imageUrl + name +  ".jpg")  {
             self.subscriber?.notify()
         }
     }
     
-    private func savePokemonStats() {
-        DispatchQueue.main.async {
-            guard let info = self.pokemonInfo else { return }
-            var convertedStats = List<StatData>() //CONVERTER
-            for stat in info.stats {
-                convertedStats.append(StatData(baseStat: stat.baseStat, effort: stat.effort, stat: SpeciesData(name: stat.stat.name, url: stat.stat.url)))
-            } //CONVERTER
-            let stats = PokemonStats(stats: convertedStats)
-            stats.pokeId = info.id
-            
-            try! self.dbRef?.write {
-                self.dbRef?.add(stats)
-            }
-        }
+    func loadEvolution() {
+        
     }
     
     //start Notifier
     
     func notifyData(_ data: Any?) {
-        pokemonInfo = data as? PokemonInfo
+        pokemonInfo = data as? PokemonStats
+        guard let info = self.pokemonInfo else {
+            subscriber?.notify()
+            return
+        }
+        repository.savePokemonInfo(data: info)
+        subscriber?.notify()
     }
     
     //end

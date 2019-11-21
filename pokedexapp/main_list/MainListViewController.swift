@@ -25,7 +25,6 @@ class MainListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupUi()
         setupListeners()
         getData()
@@ -50,6 +49,7 @@ class MainListViewController: UIViewController {
             table.estimatedRowHeight = UITableView.automaticDimension
             table.delegate = self
             table.dataSource = self
+            table.prefetchDataSource = self
             table.register(PokemonListTableViewCell.self, forCellReuseIdentifier: tableCellIdentifier)
             return table
         }()
@@ -63,7 +63,7 @@ class MainListViewController: UIViewController {
             listTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 8),
             listTableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             listTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -8),
-            listTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            listTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
             ])
         
     }
@@ -152,12 +152,14 @@ class MainListViewController: UIViewController {
 extension MainListViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.pokemons?.results[collectionView.tag].type.count ?? 0
+        guard let pokes = viewModel.pokemons else { return 0 }
+        return pokes[collectionView.tag].type.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: collectionCellIdentifier, for: indexPath) as! TypeCollectionViewCell
-        guard let currentType = viewModel.pokemons?.results[collectionView.tag].type[indexPath.item] else { return cell }
+        guard let pokes = viewModel.pokemons else { return cell }
+        let currentType = pokes[collectionView.tag].type[indexPath.item]
         cell.type.text = currentType
         cell.type.backgroundColor = cell.changeColor(currentType)
         return cell
@@ -177,7 +179,30 @@ extension MainListViewController: UICollectionViewDelegateFlowLayout, UICollecti
 extension MainListViewController:  UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.pokemons?.results.count ?? 0
+        guard let pokes = viewModel.pokemons else { return 0 }
+        return pokes.count
+    }
+    
+}
+
+extension MainListViewController: UITableViewDataSourcePrefetching {
+    
+    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+        for indexPath in indexPaths {
+            let row = indexPath.row
+            if let _ = viewModel.pokemonImages[row] {
+            } else {
+//                print("keklikPrefetch", row)
+                viewModel.fetchPokemons(indexOf: row, isImportant: false)
+            }
+        }
+        
+    }
+    
+    func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
+        for indexPath in indexPaths {
+            viewModel.cancelFetchPokemons(indexOf: indexPath.row)
+        }
     }
     
 }
@@ -187,17 +212,24 @@ extension MainListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = listTableView.dequeueReusableCell(withIdentifier: tableCellIdentifier, for: indexPath) as! PokemonListTableViewCell
         let row = indexPath.row
-        guard let pokemons = viewModel.pokemons?.results else { return cell }
+        guard let pokemons = viewModel.pokemons else { return cell }
         let currentPokemon = pokemons[row]
+        cell.tag = row
         cell.name.text = currentPokemon.name
-        cell.photo.loadImageFromUrl(currentPokemon.sprites.large) {}
+        if let image = viewModel.pokemonImages[row] {
+            cell.photo.image = image
+        } else {
+            viewModel.fetchPokemons(indexOf: row, isImportant: true)
+        }
+//        cell.photo.loadImageFromUrl(currentPokemon.sprites.large) {}
         cell.setCollectionViewData(source: self, row: row)
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        guard let name = viewModel.pokemons?.results[indexPath.row].name.lowercased() else { return }
+        guard let pokes = viewModel.pokemons else { return }
+        let name = pokes[indexPath.row].name.lowercased()
         profileImage.isHidden = true //
         let infoVC = InfoViewController()//
         infoVC.setPokemonName(name: name)//
@@ -211,6 +243,13 @@ extension MainListViewController: MainNotifier {
     func updateData() {
         DispatchQueue.main.async {
             self.listTableView.reloadData()
+        }
+    }
+    
+    func updateRow(row: Int) {
+        let indexPath = IndexPath(row: row, section: 0)
+        if (listTableView.indexPathsForVisibleRows?.contains(indexPath) ?? false) {
+            listTableView.reloadRows(at: [indexPath], with: .none)
         }
     }
     

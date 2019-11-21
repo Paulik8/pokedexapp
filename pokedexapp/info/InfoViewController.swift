@@ -17,7 +17,7 @@ class InfoViewController: UIViewController {
     var pokemonName: String? {
         didSet {
             title = pokemonName
-            self.viewModel.createRequest(name: pokemonName!)
+            self.viewModel.createRequest(name: pokemonName!, id: 1)
         }
     }
     
@@ -112,7 +112,7 @@ class InfoViewController: UIViewController {
     
     @objc private func containerClicked() {
         let clearVC = ClearViewController()
-        clearVC.setBundle(id: viewModel.pokemonInfo!.id)
+        clearVC.setBundle(id: viewModel.pokemonInfo!.pokeId)
 //        rateVC.transitioningDelegate = self
         clearVC.modalPresentationStyle = .overFullScreen
         
@@ -157,8 +157,8 @@ extension InfoViewController: SubscriberDelegate, UIViewControllerTransitioningD
 
         DispatchQueue.main.async {
             if let data = self.viewModel.pokemonInfo {
-                self.height.elementValue.text = "\(data.height)"
-                self.weight.elementValue.text = "\(data.weight)"
+                self.height.elementValue.text = "\(data.pokeId)"
+                self.weight.elementValue.text = "\(data.pokeId)"
             }
         
             if let image = self.viewModel.poster.image {

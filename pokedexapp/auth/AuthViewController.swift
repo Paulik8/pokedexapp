@@ -20,7 +20,7 @@ class AuthViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        authViewModel.submitButtonDowm()
+        authViewModel.checkKeyboardState()
     }
     
     func hideKeyboardAnywhereClicked() {

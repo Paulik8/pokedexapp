@@ -12,7 +12,14 @@ import RealmSwift
 class ChainData: Object {
     
     var chainId: Int = 0
-    var pokemonStat: PokemonStats? = PokemonStats()
+    let dictionaryChain = List<DictionaryChain>()
+    
+    convenience init(dict: List<DictionaryChain>) {
+        self.init()
+        for el in dict {
+            dictionaryChain.append(el)
+        }
+    }
     
 }
 

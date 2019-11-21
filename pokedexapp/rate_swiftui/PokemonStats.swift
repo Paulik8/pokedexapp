@@ -17,9 +17,11 @@ class PokemonStats: Object {
     
     convenience init(stats: List<StatData>) {
         self.init()
-        for stat in  stats {
+        for stat in stats {
             self.stats.append(stat)
         }
     }
     
 }
+
+
