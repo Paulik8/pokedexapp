@@ -11,11 +11,15 @@ import Foundation
 class Service {
     
     var viewModel: Notifier?
+    var infoViewModel: InfoNotifier?
+    var chainNotifier: ChainNotifier?
     var converter: Converter?
+    let infoConverter = InfoConverter()
     var dataTasks = [URLSessionDataTask]()
     
     let listPokemonUrl = "https://raw.githubusercontent.com/joseluisq/pokemons/master/pokemons.json"
     let infoPokemonUrl = "https://pokeapi.co/api/v2/pokemon/"
+    let speciesPokemonUrl = "https://pokeapi.co/api/v2/pokemon-species/"
     let imageUrl: String = "https://img.pokemondb.net/artwork/"
     let pictureExtension = ".jpg"
     
@@ -32,12 +36,12 @@ class Service {
                     handler(image)
                 }
             }
-            dataTask.resume()
             if (isImportant) {
                 dataTask.priority = URLSessionDataTask.highPriority
             } else {
                 dataTask.priority = URLSessionDataTask.lowPriority
             }
+            dataTask.resume()
             dataTasks.append(dataTask)
         }
     }
@@ -89,14 +93,54 @@ class Service {
           do {
             guard let data = data else { return }
             let decodedPokemonInfo = try JSONDecoder().decode(PokemonInfo.self, from: data)
-            let converter = InfoConverter()
-            let convertedPokemonInfo = converter.convert(infoPokemon: decodedPokemonInfo)
-            self.viewModel?.notifyData(convertedPokemonInfo)
+            let convertedPokemonInfo = self.infoConverter.convert(infoPokemon: decodedPokemonInfo)
+            self.infoViewModel?.notifyData(data: convertedPokemonInfo)
             }
             catch {
                 print(error)
             }
         }.resume()
+    }
+    
+    func loadEvolutionUrl(pokemonId id: Int) {
+        guard let url = URL(string: speciesPokemonUrl + "\(id)") else {
+            return }
+        URLSession.shared.dataTask(with: url) { (data, res, err) in
+            do {
+                guard let data = data else { return }
+                let decodedData = try newJSONDecoder().decode(PokemonSpecies.self, from: data)
+                self.loadEvolutionChain(decodedData.evolutionChain.url)
+            } catch {
+                print(error)
+            }
+        }.resume()
+    }
+    
+    private func loadEvolutionChain(_ evolutionChainUrl: String) {
+        guard let url = URL(string: evolutionChainUrl) else { return }
+        URLSession.shared.dataTask(with: url, completionHandler: { (data, res, err) in
+            if err != nil { return }
+            guard let data = data else { return }
+            do {
+                let dec = try newJSONDecoder().decode(PokemonChain.self, from: data)
+                self.chainNotifier?.setChainId(id: dec.id!)
+                self.chainNotifier?.chainResolved(chain: dec.chain)
+            } catch {
+                print (error)
+            }
+        }).resume()
+    }
+    
+    func loadPokemonInfoFromIntermediateArray(url: URL, _ handler: @escaping (PokemonStats) -> Void) {
+        let group = DispatchGroup()
+        group.enter()
+        URLSession.shared.dataTask(with: url, completionHandler: { (data, res, err) in
+            guard let data = data else { return }
+            guard let decodedData = try? newJSONDecoder().decode(PokemonInfo.self, from: data) else { return }
+            let convertedPokemonInfo = self.infoConverter.convert(infoPokemon: decodedData)
+            handler(convertedPokemonInfo)
+            group.leave()
+        }).resume()
     }
      
     func charCheck(name str: String) -> String {

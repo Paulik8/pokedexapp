@@ -18,6 +18,8 @@ class InfoConverter {
         } //CONVERTER
         let stats = PokemonStats(stats: convertedStats)
         stats.pokeId = infoPokemon.id
+        stats.height = infoPokemon.height
+        stats.weight = infoPokemon.weight
         return stats
     }
     

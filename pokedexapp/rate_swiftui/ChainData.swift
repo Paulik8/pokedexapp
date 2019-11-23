@@ -11,13 +11,13 @@ import RealmSwift
 
 class ChainData: Object {
     
-    var chainId: Int = 0
-    let dictionaryChain = List<DictionaryChain>()
+    @objc dynamic var chainId: Int = 0
+    let stats = List<PokemonStats>()
     
-    convenience init(dict: List<DictionaryChain>) {
+    convenience init(dict: List<PokemonStats>) {
         self.init()
         for el in dict {
-            dictionaryChain.append(el)
+            stats.append(el)
         }
     }
     

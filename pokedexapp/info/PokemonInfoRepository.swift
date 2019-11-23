@@ -38,4 +38,19 @@ class PokemonInfoRepository {
         }
     }
     
+    func savePokemonChain(chain data: ChainData) {
+        DispatchQueue.main.async {
+            if let dbObject = self.dbRef?.objects(ChainData.self).filter("chainId = \(data.chainId)").first {
+                try! self.dbRef?.write {
+                    self.dbRef?.delete(dbObject)
+                    self.dbRef?.add(data)
+                }
+            } else {
+                try! self.dbRef?.write {
+                self.dbRef?.add(data)
+                }
+            }
+        }
+    }
+    
 }

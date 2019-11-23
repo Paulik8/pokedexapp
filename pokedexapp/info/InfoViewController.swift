@@ -14,12 +14,6 @@ class InfoViewController: UIViewController {
     var hostVC: UIHostingController<RateView>!
     let transitionDelegate: UIViewControllerTransitioningDelegate = TransitionDelegate()
     var viewModel = InfoViewModel()
-    var pokemonName: String? {
-        didSet {
-            title = pokemonName
-            self.viewModel.createRequest(name: pokemonName!, id: 1)
-        }
-    }
     
     var photo: UIImageView = {
         let image = UIImageView()
@@ -52,13 +46,19 @@ class InfoViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupUi()
         setupListeners()
     }
     
     func setPokemonName(name: String) {
-        pokemonName = name
+        viewModel.pokemonName = name
+        title = viewModel.pokemonName
+    }
+    
+    func setPokemonId(id: Int, imageId: String) {
+        viewModel.pokemonId = id
+        viewModel.idForImage = imageId
+        viewModel.createRequest(name: viewModel.pokemonName!, id: viewModel.pokemonId!)
     }
     
     private func setupUi() {
@@ -157,8 +157,8 @@ extension InfoViewController: SubscriberDelegate, UIViewControllerTransitioningD
 
         DispatchQueue.main.async {
             if let data = self.viewModel.pokemonInfo {
-                self.height.elementValue.text = "\(data.pokeId)"
-                self.weight.elementValue.text = "\(data.pokeId)"
+                self.height.elementValue.text = "\(data.height)"
+                self.weight.elementValue.text = "\(data.weight)"
             }
         
             if let image = self.viewModel.poster.image {

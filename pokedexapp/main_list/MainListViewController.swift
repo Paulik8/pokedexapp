@@ -229,10 +229,13 @@ extension MainListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         guard let pokes = viewModel.pokemons else { return }
-        let name = pokes[indexPath.row].name.lowercased()
+        let curPokemon = pokes[indexPath.row]
+        let name = curPokemon.name.lowercased()
+        let id = Int(curPokemon.nationalNumber) ?? 2
         profileImage.isHidden = true //
         let infoVC = InfoViewController()//
         infoVC.setPokemonName(name: name)//
+        infoVC.setPokemonId(id: id, imageId: curPokemon.nationalNumber)
         self.navigationController?.pushViewController(infoVC, animated: true) //
     }
     

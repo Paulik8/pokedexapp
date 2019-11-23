@@ -25,9 +25,8 @@ class RateNewViewModel: ObservableObject {
     var pokemonStats: PokemonStats? {
         didSet {
             self.numberOfPages = 3
-            self.capsuleHeight = 100
+            self.capsuleHeight = pokemonStats!.height
             self.name = imageUrl + "bulbasaur.jpg"
-//            self.name = (self.pokemonStats?.stats[0].stat!.name)!
         }
     }
     @Published var name: String = ""
@@ -54,12 +53,12 @@ class RateNewViewModel: ObservableObject {
     
     func startObserve() {
         let dbRef = app?.realm
-        print ("startObserve", dbRef?.objects(PokemonStats.self))
-        notification = dbRef?.objects(PokemonStats.self).observe({ (changes) in
+        notification = dbRef?.objects(ChainData.self).filter("chainId = \(id!)").observe({ (changes) in
             switch changes {
             case .initial:
                 guard let id = self.id else { return }
-                self.pokemonStats = self.app?.realm?.objects(PokemonStats.self).filter("pokeId = \(id)").first
+                guard let chainData = self.app?.realm?.objects(ChainData.self).filter("chainId = \(id)").first else { return }
+                self.pokemonStats = chainData.stats.first!
                 print ("startObserveInitial")
             case .update(let results, let deletions, let insertions, let modifications):
 //                self.pokemonStats = self.app?.realm?.objects(PokemonStats.self).filter("id = \(id)").first
