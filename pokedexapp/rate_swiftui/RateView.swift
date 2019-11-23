@@ -18,7 +18,7 @@ struct RateView: View {
     @ObservedObject var viewModel: RateNewViewModel = RateNewViewModel()
     
     func updateViewModel() {
-        if let viewModelId = viewModel.id {
+        if let _ = viewModel.id {
             return
         } else {
             viewModel.id = id
@@ -32,19 +32,26 @@ struct RateView: View {
                 ImageView(withURL: viewModel.name).padding(.bottom, 30)
                 
                 HStack(spacing: 16) {
-                    
-                BarView(value: capsuleHeight1)
-                    .onReceive(viewModel.didChange) { data in
-                        self.capsuleHeight1 = CGFloat(integerLiteral: 150)
+                    ForEach(viewModel.stats) { data in
+                        BarView(value: CGFloat(data.baseStat))
+                    }
                 }
-                BarView(value: capsuleHeight2)
-                    .onReceive(viewModel.didChange) { data in
-                        self.capsuleHeight2 = CGFloat(integerLiteral: data.capsuleHeight)
-                }
-                BarView(value: capsuleHeight3)
-                    .onReceive(viewModel.didChange) { data in
-                        self.capsuleHeight3 = CGFloat(integerLiteral: 120)
-                }
+                
+                
+//                HStack(spacing: 16) {
+//
+//                    BarView(value: viewModel.pokemonStats?.stats[0].baseStat ?? 0)
+//                    .onReceive(viewModel.didChange) { data in
+//                        self.capsuleHeight1 = CGFloat(integerLiteral: 150)
+//                }
+//                BarView(value: capsuleHeight2)
+//                    .onReceive(viewModel.didChange) { data in
+//                        self.capsuleHeight2 = CGFloat(integerLiteral: data.capsuleHeight)
+//                }
+//                BarView(value: capsuleHeight3)
+//                    .onReceive(viewModel.didChange) { data in
+//                        self.capsuleHeight3 = CGFloat(integerLiteral: 120)
+//                }
 //                ZStack(alignment: .bottom) {
 //                    Capsule().frame(width: 30, height: 200).foregroundColor(.gray)
 //                    Capsule().frame(width: 30, height: capsuleHeight)
@@ -52,14 +59,13 @@ struct RateView: View {
 //                        .onReceive(viewModel.didChange) { data in
 //                            self.capsuleHeight = CGFloat(integerLiteral: data.capsuleHeight)
 //                    }
-                }
+//                }
                 PageControl(numberPages: viewModel.numberOfPages)
                 }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
             .background(SwiftUI.Color.white)
             .cornerRadius(30)
             .padding(EdgeInsets(top: topInset!, leading: 0, bottom: 0, trailing: 0))
-            .animation(.default)
             
             
             
@@ -70,6 +76,7 @@ struct RateView: View {
 //            }
         }
         .edgesIgnoringSafeArea(.all)
+        
         
 //        .animation(.spring())
             
@@ -90,7 +97,7 @@ struct BarView: View {
         ZStack (alignment: .bottom) {
             Capsule().frame(width: 30, height: 200).foregroundColor(SwiftUI.Color(red: 240/255, green: 240/255, blue: 240/255, opacity: 1))
             Capsule().frame(width: 30, height: value).foregroundColor(.gray)
-                .animation(.linear(duration: 0.8))
+                .animation(.linear(duration: 1))
         }
     }
 }

@@ -111,9 +111,9 @@ class InfoViewController: UIViewController {
     }
     
     @objc private func containerClicked() {
+        guard let chainId = viewModel.chainId else { return }
         let clearVC = ClearViewController()
-        clearVC.setBundle(id: viewModel.pokemonInfo!.pokeId)
-//        rateVC.transitioningDelegate = self
+        clearVC.setBundle(id: chainId)
         clearVC.modalPresentationStyle = .overFullScreen
         
         present(clearVC, animated: false) {
@@ -121,32 +121,6 @@ class InfoViewController: UIViewController {
                 clearVC.view?.backgroundColor = UIColor(white: -1, alpha: 0.5)
             }
         }
-//            let hostVC = RateHostingViewController(rootView: RateView(id: viewModel.pokemonInfo!.id))
-//            hostVC.view?.backgroundColor = UIColor.clear
-//            hostVC.modalPresentationStyle = .overFullScreen
-//            present(hostVC, animated: true, completion: nil)
-//        hostVC.setBlurView()
-//        self.setBlurView()
-//        navigationController?.setBlurView()
-//        present(hostVC, animated: true)
-        
-        
-//            UIView.animate(withDuration: 4) {
-//                hostVC.view?.backgroundColor = UIColor(white: -1, alpha: 0.5)
-//            }
-//        {
-        
-//        rateVC.modalPresentationStyle = .formSheet
-//        rateVC.updateBundle(id: viewModel.pokemonInfo!.id)
-//        self.transitioningDelegate = transitionDelegate
-//        rateVC.transitioningDelegate = self
-//        rateVC.modalPresentationStyle = .custom
-//        self.present(rateVC, animated: true, completion: nil)
-//        rateVC.view.frame = CGRect(x: 0, y: 0, width: 400, height: 600)
-        
-//        present(rateVC, animated: true, completion: nil)
-//        rateVC.view.frame = CGRect(x: 0, y: rateVC.view.frame.height * 0.7, width: rateVC.view.bounds.width, height: rateVC.view.frame.height * 0.3)
-//        rateVC.view.clipsToBounds = true
     }
 
 }

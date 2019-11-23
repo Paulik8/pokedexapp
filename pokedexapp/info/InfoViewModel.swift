@@ -21,11 +21,11 @@ class InfoViewModel {
     var pokemonName: String?
     var idForImage: String?
     var pokemonId: Int?
-//    {
-//        didSet {
-//            self.loadEvolution()
-//        }
-//    }
+    {
+        didSet {
+            self.loadEvolution()
+        }
+    }
     var pokemonInfo: PokemonStats?
     var speciesChainIntermediateArr: [ChainSpecies]? {
         didSet {
@@ -147,7 +147,6 @@ extension InfoViewModel: InfoNotifier, ChainNotifier {
         }
         repository.savePokemonInfo(data: info)
         subscriber?.notify()
-        self.loadEvolution()
     }
     
     //end

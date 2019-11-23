@@ -9,7 +9,7 @@
 import Foundation
 import RealmSwift
 
-class StatData: Object {
+class StatData: Object, Identifiable {
     @objc dynamic var baseStat: Int = 0
     @objc dynamic var effort: Int = 0
     @objc dynamic var stat: SpeciesData? = SpeciesData()
