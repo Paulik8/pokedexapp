@@ -53,4 +53,9 @@ class PokemonInfoRepository {
         }
     }
     
+    func getChainData(chainId id: Int) -> ChainData? {
+        guard let data = dbRef?.objects(ChainData.self).filter("chainId = \(id)").first else { return nil }
+        return data
+    }
+    
 }

@@ -112,8 +112,9 @@ class InfoViewController: UIViewController {
     
     @objc private func containerClicked() {
         guard let chainId = viewModel.chainId else { return }
+        guard let chainSize = viewModel.getChainData() else { return }
         let clearVC = ClearViewController()
-        clearVC.setBundle(id: chainId)
+        clearVC.setBundle(chainId: chainId, chainSize: chainSize)
         clearVC.modalPresentationStyle = .overFullScreen
         
         present(clearVC, animated: false) {
@@ -147,11 +148,11 @@ extension InfoViewController: SubscriberDelegate, UIViewControllerTransitioningD
     
 }
 
-final class RateHostingViewController: UIHostingController<RateView> {
+final class RateHostingViewController: UIHostingController<ComplexRateView> {
     
     var clearVC: ClearNotifier?
     
-    override init(rootView: RateView) {
+    override init(rootView: ComplexRateView) {
         super.init(rootView: rootView)
         setListener()
     }

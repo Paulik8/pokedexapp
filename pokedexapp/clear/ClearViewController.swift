@@ -7,13 +7,16 @@
 //
 
 import UIKit
+import SwiftUI
 
 class ClearViewController: UIViewController {
     
-    private var id: Int?
+    private var chainId: Int?
+    private var chainSize: Int?
     
-    func setBundle(id: Int) {
-        self.id = id
+    func setBundle(chainId: Int, chainSize: Int) {
+        self.chainId = chainId
+        self.chainSize = chainSize
     }
     
     override func viewDidLoad() {
@@ -22,7 +25,14 @@ class ClearViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         let paddingTop = view.bounds.height / 3
-        let hostVC = RateHostingViewController(rootView: RateView(topInset: paddingTop, id: self.id!))
+        var iteration = 0
+        guard let chainSize = self.chainSize else { return }
+        var subviews = [UIHostingController<RateView>]()
+        while (iteration < chainSize) {
+            subviews.append(UIHostingController(rootView: RateView(topInset: paddingTop, chainId: chainId!, id: iteration)))
+            iteration += 1
+        }
+        let hostVC = RateHostingViewController(rootView: ComplexRateView(topInset: paddingTop, subviews: subviews))
         hostVC.clearVC = self
         hostVC.view?.backgroundColor = UIColor.clear
         hostVC.modalPresentationStyle = .overFullScreen

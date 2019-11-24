@@ -17,7 +17,8 @@ class RateNewViewModel: ObservableObject {
     let didChange = PassthroughSubject<RateNewViewModel, Never>()
     var notification: NotificationToken?
     let app = (UIApplication.shared).delegate as? AppDelegate
-    var id: Int? {
+    var id: Int?
+    var chainId: Int? {
         didSet {
             startObserve()
         }
@@ -31,6 +32,7 @@ class RateNewViewModel: ObservableObject {
 //        }
 //    }
     @Published var stats = [StatData]()
+    @Published var stats2 = [StatData]()
     @Published var name: String = ""
     @Published var numberOfPages: Int = 0
     var capsuleHeight: Int = 0 {
@@ -54,14 +56,13 @@ class RateNewViewModel: ObservableObject {
 //    }
     
     func startObserve() {
-        self.falseUntieChain()
         let dbRef = app?.realm
-        notification = dbRef?.objects(ChainData.self).filter("chainId = \(id!)").observe({ (changes) in
+        notification = dbRef?.objects(ChainData.self).filter("chainId = \(chainId!)").observe({ (changes) in
             switch changes {
             case .initial:
-                guard let id = self.id else { return }
+                guard let id = self.chainId else { return }
                 guard let chainData = self.app?.realm?.objects(ChainData.self).filter("chainId = \(id)").first else { return }
-                self.pokemonStats = chainData.stats.first!
+                self.pokemonStats = chainData.stats[self.id!]
                 self.numberOfPages = chainData.stats.count
                 self.untieChain(data: chainData)
                 print ("startObserveInitial")
@@ -74,24 +75,13 @@ class RateNewViewModel: ObservableObject {
         })
     }
     
-    private func falseUntieChain() {
-        var arr = [StatData]()
-        for _ in (0..<2) {
-            arr.append(StatData(baseStat: 0, effort: 0, stat: SpeciesData(name: "", url: "")))
-        }
-        stats = arr
-    }
-    
     private func untieChain(data chain: ChainData) {
-        guard let statsItem = chain.stats.first else { return }
+        let statsItem = chain.stats[id!]
         var arr = [StatData]()
         for el in statsItem.stats {
             arr.append(el)
         }
         stats = arr
-//        for el in statsItem.stats {
-//
-//        }
     }
     
     func removeObservable() {

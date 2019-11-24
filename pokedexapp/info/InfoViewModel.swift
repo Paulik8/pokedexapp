@@ -64,6 +64,12 @@ class InfoViewModel {
         service.loadEvolutionUrl(pokemonId: pokemonId!)
     }
     
+    func getChainData() -> Int? {
+        guard let chainId = self.chainId else { return nil }
+        guard let chainData = repository.getChainData(chainId: chainId) else { return nil }
+        return chainData.stats.count
+    }
+    
     private func saveChainData() {
         let size = pokemonChain.count
         var iterations = 0

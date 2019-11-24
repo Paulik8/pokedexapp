@@ -11,25 +11,19 @@ import SwiftUI
 
 struct PageControl: UIViewRepresentable {
     
-    var current = 0
     var numberPages: Int?
-    
-    init(numberPages: Int) {
-        self.numberPages = numberPages
-    }
+    @Binding var currentPageIndex: Int
     
     func updateUIView(_ uiView: UIPageControl , context: UIViewRepresentableContext<PageControl>) {
         guard let numberPages = self.numberPages else { return }
         uiView.numberOfPages = numberPages
-        uiView.currentPage = current
+        uiView.currentPage = currentPageIndex
     }
     
     func makeUIView(context: UIViewRepresentableContext<PageControl>) -> UIPageControl {
         let page = UIPageControl()
         page.pageIndicatorTintColor = UIColor.lightGray
-//            UIColor(red: 255/255, green: 225/255, blue: 240/255, alpha: 1)
         page.currentPageIndicatorTintColor = UIColor.darkGray
-//            UIColor(red: 255/255, green: 135/255, blue: 195/255, alpha: 1)
         guard let numberPages = self.numberPages else { return page }
         page.numberOfPages = numberPages
         return page
