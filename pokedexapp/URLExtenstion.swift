@@ -23,6 +23,33 @@ extension UIImageView {
             }
         }.resume()
     }
+    
+    func loadImagePng(_ urlStr: String, _ id: String,  _ callback: @escaping () -> Void) {
+        let cacheManager = CacheManager.shared
+        if let cachedImage = cacheManager.getCachedImage(id: id) {
+            DispatchQueue.main.async {
+                print("kekliKCached", id)
+                self.image = cachedImage
+                callback()
+            }
+        } else {
+            guard let url = URL(string: urlStr + id + ".png") else { return }
+            URLSession.shared.dataTask(with: url) { (data, res, err) in
+                if err != nil {
+                    print("keklik", err)
+                    return }
+                guard let image = data else { return }
+                guard let decodedImage = UIImage(data: image) else { return }
+                DispatchQueue.main.async {
+                    self.image = decodedImage
+                    print("kekliKNotCached", id)
+                    cacheManager.cacheImage(id: id, data: decodedImage)
+                    callback()
+                }
+            }.resume()
+        }
+    }
+    
 }
 
 extension Array {

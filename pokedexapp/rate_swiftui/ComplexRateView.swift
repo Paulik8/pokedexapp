@@ -15,10 +15,10 @@ struct ComplexRateView: View {
     @State var currentPageIndex = 0
     
     var body: some View {
-        VStack(alignment: .center) {
-            PageViewController(currentPageIndex: $currentPageIndex, viewControllers: subviews)
-            PageControl(numberPages: subviews.count, currentPageIndex: $currentPageIndex)
-                .padding(.bottom, 50)
+        ZStack(alignment: .bottom) {
+                PageViewController(currentPageIndex: $currentPageIndex, viewControllers: subviews)
+                PageControl(numberPages: subviews.count, currentPageIndex: $currentPageIndex)
+                    .padding(.bottom, 45)
         }
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: UIScreen.main.bounds.height - topInset!, alignment: .top)
         .background(SwiftUI.Color.white)

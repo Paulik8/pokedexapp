@@ -10,6 +10,7 @@ import Foundation
 import RealmSwift
 
 class PokemonData: Object {
+    @objc dynamic var pokemonDataId = UUID().uuidString
     @objc dynamic var nationalNumber: String = ""
     @objc dynamic var name: String = ""
     @objc dynamic var sprites: ImagesData?
@@ -20,6 +21,10 @@ class PokemonData: Object {
         for el in types {
             self.type.append(el)
         }
+    }
+    
+    override class func primaryKey() -> String? {
+        return "pokemonDataId"
     }
     
 }

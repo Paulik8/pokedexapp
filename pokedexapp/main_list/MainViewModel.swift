@@ -11,18 +11,23 @@ import RealmSwift
 
 class MainViewModel: Notifier {
     
+    let images: String = "https://assets.pokemon.com/assets/cms2/img/pokedex/detail/"
+    let extensionImages = ".png"
+    
     var mainVC: MainNotifier?
     let converter = MainConverter()
     let repository = MainPokemonRepository.shared
-    var pokemonImages = [Int:UIImage]()
+    var pokemonImages = [String : UIImage]()
     var pokemons: [PokemonData]?
+    var filteredPokemons = [PokemonData]()
+    let cacheManager = CacheManager.shared
 //    {
 //        didSet {
 //            mainVC!.updateData()
 //        }
 //    }
     var notification: NotificationToken?
-    var service = Service()
+    var service = NetworkService()
     
     init() {
         service.viewModel = self
@@ -37,15 +42,24 @@ class MainViewModel: Notifier {
         service.getPokemons()
     }
     
-    func fetchPokemons(indexOf: Int, isImportant priority: Bool) {
+    func fetchPokemons(indexOf: Int, isImportant priority: Bool, _ isFiltered: Bool?, _ completion: @escaping () -> Void) {
         guard let pokes = pokemons else { return }
-        guard let sprites = pokes[indexOf].sprites else { return }
-        guard let imageUrl = sprites.large else { return }
+        let nationalNumber: String
+        if let filtered = isFiltered {
+            if (filtered) {
+                nationalNumber = filteredPokemons[indexOf].nationalNumber
+            } else {
+                nationalNumber = pokes[indexOf].nationalNumber
+            }
+        } else {
+            nationalNumber = pokes[indexOf].nationalNumber
+        }
+        let imageUrl = images + nationalNumber + extensionImages
         service.fetchWithDataTask(imageUrl, priority) {
-            print("keklik", indexOf, priority)
-            let image = UIImage(data: $0)
-            self.pokemonImages[indexOf] = image
-            self.mainVC?.updateRow(row: indexOf)
+            self.cacheManager.cacheImage(id: nationalNumber, data: $0)
+            self.pokemonImages[nationalNumber] = $0
+            completion()
+//            self.mainVC?.updateRow(row: indexOf)
         }
     }
     
@@ -58,6 +72,14 @@ class MainViewModel: Notifier {
     
     func checkCharsName(name: String) -> String {
         return service.charCheck(name: name)
+    }
+    
+    func filteredDataForSearch(_ searchText: String) {
+        guard let loadedPokemons = pokemons else { return }
+        filteredPokemons = loadedPokemons.filter({ (pokemonItem: PokemonData) -> Bool in
+            return pokemonItem.name.lowercased().contains(searchText.lowercased())
+        })
+        mainVC?.updateData()
     }
     
 //    func getProfileLogoUrl() -> String? {

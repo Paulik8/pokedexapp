@@ -10,7 +10,6 @@ import SwiftUI
 import Combine
 
 struct RateView: View {
-    var topInset: CGFloat?
     var chainId: Int?
     var id: Int?
     
@@ -28,31 +27,27 @@ struct RateView: View {
     
     var body: some View {
         updateViewModel()
-        return ZStack {
-            VStack {
-                ZStack {
-                    CardView(arr: viewModel.stats)
-                }
-                
-//                PageControl(current: currentPage, numberPages: viewModel.numberOfPages)
-            }
-//            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
-//            .background(SwiftUI.Color.white)
-//            .cornerRadius(30)
-//            .padding(EdgeInsets(top: topInset!, leading: 0, bottom: 0, trailing: 0))
+        return ZStack(alignment: .top) {
+            CardView(arr: viewModel.stats, imageUrl: viewModel.name)
         }
-//        .edgesIgnoringSafeArea(.all)
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
     }
 }
 
 struct CardView: View {
     
     var arr = [StatData]()
+    var imageUrl: String
     
     var body: some View {
-        HStack(spacing: 16) {
-            ForEach(arr) { data in
-                BarView(value: CGFloat(data.baseStat))
+        VStack(alignment: .center) {
+            ImageView(withURL: imageUrl).padding(.top, 16)
+            HStack(spacing: 12) {
+                    ForEach(arr) { data in
+                        BarView(value: CGFloat(data.baseStat), changable: 0, charName: data.stat!.name)
+                    }
+                    .padding(.top, 60)
+
             }
         }
     }
@@ -62,12 +57,36 @@ struct CardView: View {
 struct BarView: View {
     
     var value: CGFloat
+   @State var changable: CGFloat
+    var charName: String
+    let maxHeight: CGFloat = 180
     
     var body: some View {
-        ZStack (alignment: .bottom) {
-            Capsule().frame(width: 30, height: 200).foregroundColor(SwiftUI.Color(red: 240/255, green: 240/255, blue: 240/255, opacity: 1))
-            Capsule().frame(width: 30, height: value).foregroundColor(.gray)
+        VStack {
+            ZStack (alignment: .bottom) {
+                Capsule()
+                    .frame(width: 30, height: maxHeight)
+                    .foregroundColor(SwiftUI.Color(red: 240/255, green: 240/255, blue: 240/255, opacity: 1))
+                    Capsule()
+                        .frame(width: 30, height: changable)
+                        .foregroundColor(.gray)
+                        .onAppear {
+                            withAnimation(.linear(duration: 0.8)) {
+                                if (self.value * 1.2 >= self.maxHeight) {
+                                    self.changable = self.maxHeight
+                                } else {
+                                    self.changable = self.value * 1.2
+                                }
+                            }
+                }
+            }
+            Text(charName)
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: 50, alignment: .center)
+            .rotationEffect(.degrees(-45))
+            .lineLimit(2)
+            .padding(.top, 16)
         }
+        
     }
 }
 
@@ -85,7 +104,7 @@ struct ImageView: View {
             Image(uiImage: image)
             .resizable()
             .aspectRatio(contentMode: .fit)
-            .frame(width:200, height:200)
+            .frame(width:140, height:140)
         }.onReceive(imageLoader.didChange) { data in
             self.image = UIImage(data: data) ?? UIImage()
         }

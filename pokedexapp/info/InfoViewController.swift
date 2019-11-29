@@ -47,7 +47,17 @@ class InfoViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUi()
+        navigationItem.largeTitleDisplayMode = .automatic
         setupListeners()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+//        navigationController?.setNavigationBarHidden(false, animated: animated)
+//        navigationController?.navigationBar.barTintColor = Colors.DEFAULT_BACKGROUND
+    }
+    
+    override func willMove(toParent parent: UIViewController?) {
     }
     
     func setPokemonName(name: String) {
@@ -64,12 +74,12 @@ class InfoViewController: UIViewController {
     private func setupUi() {
         view.backgroundColor = Colors.DEFAULT_BACKGROUND
         
-        navigationController?.navigationBar.prefersLargeTitles = true
-        
         view.addSubview(photo)
         view.addSubview(container)
         view.addSubview(height)
         view.addSubview(weight)
+//        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationController?.navigationBar.barTintColor = Colors.DEFAULT_BACKGROUND
         
         NSLayoutConstraint.activate([
             
@@ -130,15 +140,13 @@ extension InfoViewController: SubscriberDelegate, UIViewControllerTransitioningD
     
     func notify() {
 
-        DispatchQueue.main.async {
-            if let data = self.viewModel.pokemonInfo {
-                self.height.elementValue.text = "\(data.height)"
-                self.weight.elementValue.text = "\(data.weight)"
-            }
-        
-            if let image = self.viewModel.poster.image {
-                self.photo.image = image
-            }
+        if let data = self.viewModel.pokemonInfo {
+            self.height.elementValue.text = "\(data.height)"
+            self.weight.elementValue.text = "\(data.weight)"
+        }
+    
+        if let image = self.viewModel.poster.image {
+            self.photo.image = image
         }
     }
     
@@ -186,10 +194,6 @@ final class RateHostingViewController: UIHostingController<ComplexRateView> {
         if (point.y < rootViewTopInset) {
             tapped()
         }
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        
     }
     
     private func tapped() {

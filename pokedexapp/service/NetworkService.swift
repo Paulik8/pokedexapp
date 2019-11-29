@@ -6,9 +6,9 @@
 //  Copyright © 2019 Paulik. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
-class Service {
+class NetworkService {
     
     var viewModel: Notifier?
     var infoViewModel: InfoNotifier?
@@ -24,7 +24,7 @@ class Service {
     let pictureExtension = ".jpg"
     
     
-    func fetchWithDataTask(_ urlStr: String, _ isImportant: Bool, handler: @escaping (Data) -> Void) {
+    func fetchWithDataTask(_ urlStr: String, _ isImportant: Bool, _ handler: @escaping (UIImage) -> Void) {
         if let _ = checkDataInQueue(urlStr) {
             return
         } else {
@@ -32,8 +32,9 @@ class Service {
             let dataTask = URLSession.shared.dataTask(with: url) { (data, res, err) in
                 if err != nil { return }
                 guard let image = data else { return }
+                guard let decodedImage = UIImage(data: image) else { return }
                 DispatchQueue.main.async {
-                    handler(image)
+                    handler(decodedImage)
                 }
             }
             if (isImportant) {

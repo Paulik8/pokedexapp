@@ -29,7 +29,7 @@ class ClearViewController: UIViewController {
         guard let chainSize = self.chainSize else { return }
         var subviews = [UIHostingController<RateView>]()
         while (iteration < chainSize) {
-            subviews.append(UIHostingController(rootView: RateView(topInset: paddingTop, chainId: chainId!, id: iteration)))
+            subviews.append(UIHostingController(rootView: RateView(chainId: chainId!, id: iteration)))
             iteration += 1
         }
         let hostVC = RateHostingViewController(rootView: ComplexRateView(topInset: paddingTop, subviews: subviews))

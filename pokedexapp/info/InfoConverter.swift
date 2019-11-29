@@ -18,9 +18,20 @@ class InfoConverter {
         } //CONVERTER
         let stats = PokemonStats(stats: convertedStats)
         stats.pokeId = infoPokemon.id
+        stats.nationalNumber = idToNationalNumber(infoPokemon.id)
         stats.height = infoPokemon.height
         stats.weight = infoPokemon.weight
         return stats
+    }
+    
+    private func idToNationalNumber(_ id: Int) -> String {
+        if (id > 0 && id < 10) {
+            return "00\(id)"
+        } else if (id >= 10 && id < 100) {
+            return "0\(id)"
+        } else {
+            return "\(id)"
+        }
     }
     
 }

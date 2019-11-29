@@ -13,11 +13,11 @@ class TypeCollectionViewCell: UICollectionViewCell {
     var type: TypeLabel! = {
         let type = TypeLabel(frame: CGRect(x: 0, y: 0, width: 72, height: 32))
 //        type.sizeToFit()
-        type.clipsToBounds = true
         type.textAlignment = .center
         type.textColor = Colors.TYPELABEL_TEXT
 //        type.backgroundColor = UIColor(red: 97/255, green: 176/255, blue: 236/255, alpha: 1)
         type.layer.cornerRadius = 10
+        type.clipsToBounds = true
         type.translatesAutoresizingMaskIntoConstraints = false
         return type
     }()

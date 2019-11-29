@@ -13,7 +13,7 @@ import Combine
 
 class RateNewViewModel: ObservableObject {
     
-    let imageUrl: String = "https://img.pokemondb.net/artwork/"
+    let imageUrl: String = "https://assets.pokemon.com/assets/cms2/img/pokedex/full/"
     let didChange = PassthroughSubject<RateNewViewModel, Never>()
     var notification: NotificationToken?
     let app = (UIApplication.shared).delegate as? AppDelegate
@@ -24,13 +24,6 @@ class RateNewViewModel: ObservableObject {
         }
     }
     @Published var pokemonStats: PokemonStats?
-//    {
-//        didSet {
-//            self.numberOfPages = 3
-//            self.capsuleHeight = pokemonStats!.height
-//            self.name = imageUrl + "bulbasaur.jpg"
-//        }
-//    }
     @Published var stats = [StatData]()
     @Published var stats2 = [StatData]()
     @Published var name: String = ""
@@ -63,6 +56,7 @@ class RateNewViewModel: ObservableObject {
                 guard let id = self.chainId else { return }
                 guard let chainData = self.app?.realm?.objects(ChainData.self).filter("chainId = \(id)").first else { return }
                 self.pokemonStats = chainData.stats[self.id!]
+                self.name = self.imageUrl + self.pokemonStats!.nationalNumber + ".png"
                 self.numberOfPages = chainData.stats.count
                 self.untieChain(data: chainData)
                 print ("startObserveInitial")

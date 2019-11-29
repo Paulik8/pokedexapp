@@ -38,9 +38,10 @@ struct Chain: Codable {
 
 // MARK: - EvolutionDetail
 struct EvolutionDetail: Codable {
-    let gender, heldItem, knownMove: JSONNull?
+    let gender, heldItem: JSONNull?
     let item: Species?
-    let knownMoveType, location, minAffection, minBeauty: JSONNull?
+    let knownMove, knownMoveType: ChainSpecies?
+    let location, minAffection, minBeauty: JSONNull?
     let minHappiness: Int?
     let minLevel: Int?
     let needsOverworldRain: Bool?

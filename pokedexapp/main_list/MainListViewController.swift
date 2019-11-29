@@ -8,9 +8,9 @@
 
 import UIKit
 
-class MainListViewController: UIViewController {
+class MainListViewController: UITableViewController {
     
-    let logoImageUrl = "https://firebasestorage.googleapis.com/v0/b/pokedex-f117f.appspot.com/o/logo%2Flogo.png?alt=media&token=71179a3c-735c-4fdb-b04a-7ad627c81186"
+    let logoImageUrl =  "https://firebasestorage.googleapis.com/v0/b/pokedex-f117f.appspot.com/o/logo%2Flogo.png?alt=media&token=71179a3c-735c-4fdb-b04a-7ad627c81186"
 
     private var viewModel = MainViewModel()
     private let navigationTitle = "Pokemons"
@@ -19,9 +19,16 @@ class MainListViewController: UIViewController {
     private let collectionCellIdentifier = "pokemonCollectionList"
     
     var topNavigationAnchor: NSLayoutConstraint?
-    
-    private var listTableView: UITableView!
     var profileImage: UIButton!
+    
+    var isSearchBarEmpty: Bool {
+        return searchController.searchBar.text?.isEmpty ?? true
+    }
+    var isFiltering: Bool {
+        return searchController.isActive && !isSearchBarEmpty
+    }
+    
+    private let searchController = UISearchController(searchResultsController: nil)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,7 +38,16 @@ class MainListViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        profileImage.isHidden = false
+//        searchController.searchBar.isHidden = false
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if (searchController.isActive) {
+            profileImage.isHidden = true
+        } else {
+            profileImage.isHidden = false
+        }
     }
     
     private func getData() {
@@ -43,41 +59,34 @@ class MainListViewController: UIViewController {
     }
     
     private func setupUi() {
-        listTableView = {
-            let table = UITableView(frame: .zero, style: .plain)
-            table.translatesAutoresizingMaskIntoConstraints = false
-            table.estimatedRowHeight = UITableView.automaticDimension
-            table.delegate = self
-            table.dataSource = self
-            table.prefetchDataSource = self
-            table.register(PokemonListTableViewCell.self, forCellReuseIdentifier: tableCellIdentifier)
-            return table
-        }()
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.estimatedRowHeight = UITableView.automaticDimension
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.prefetchDataSource = self
+        tableView.register(PokemonListTableViewCell.self, forCellReuseIdentifier: tableCellIdentifier)
     
         setupNavigationBar()
-        
-        view.addSubview(listTableView)
         view.backgroundColor = .white
-        
-        NSLayoutConstraint.activate([
-            listTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 8),
-            listTableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            listTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -8),
-            listTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-            ])
-        
     }
     
     private func setupNavigationBar() {
         title = navigationTitle
         navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .automatic
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "Search Pokemons"
+        searchController.searchBar.delegate = self
+        searchController.navigationItem.hidesSearchBarWhenScrolling = true
+        definesPresentationContext = true
+        tableView.tableHeaderView = searchController.searchBar
         setupProfileLogo()
     }
     
     private func setupProfileLogo() {
         profileImage = UIButton()
         
-//        let profileUrl = 
         if (!AuthRepository.shared.getProfileLogoStatus()) {
             profileImage.setImage(#imageLiteral(resourceName: "logo"), for: .normal)
         }
@@ -138,7 +147,7 @@ class MainListViewController: UIViewController {
         viewModel.profileClicked()
     }
     
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         guard let height = navigationController?.navigationBar.frame.height else { return }
         moveAndResizeImage(for: height)
     }
@@ -153,13 +162,26 @@ extension MainListViewController: UICollectionViewDelegateFlowLayout, UICollecti
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         guard let pokes = viewModel.pokemons else { return 0 }
+        if (isFiltering) {
+            if (viewModel.filteredPokemons.count <= collectionView.tag) {
+                return 0
+            }
+            return viewModel.filteredPokemons[collectionView.tag].type.count
+        }
         return pokes[collectionView.tag].type.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: collectionCellIdentifier, for: indexPath) as! TypeCollectionViewCell
         guard let pokes = viewModel.pokemons else { return cell }
-        let currentType = pokes[collectionView.tag].type[indexPath.item]
+        let currentType: String
+        if (isFiltering) {
+            print("kekType", collectionView.tag, indexPath.item)
+            currentType = viewModel.filteredPokemons[collectionView.tag].type[indexPath.item]
+        } else {
+            print("kekType", collectionView.tag, indexPath.item)
+            currentType = pokes[collectionView.tag].type[indexPath.item]
+        }
         cell.type.text = currentType
         cell.type.backgroundColor = cell.changeColor(currentType)
         return cell
@@ -176,10 +198,13 @@ extension MainListViewController: UICollectionViewDelegateFlowLayout, UICollecti
     
 }
 
-extension MainListViewController:  UITableViewDelegate {
+extension MainListViewController {
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         guard let pokes = viewModel.pokemons else { return 0 }
+        if (isFiltering) {
+            return viewModel.filteredPokemons.count
+        }
         return pokes.count
     }
     
@@ -188,55 +213,104 @@ extension MainListViewController:  UITableViewDelegate {
 extension MainListViewController: UITableViewDataSourcePrefetching {
     
     func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
-        for indexPath in indexPaths {
-            let row = indexPath.row
-            if let _ = viewModel.pokemonImages[row] {
-            } else {
-//                print("keklikPrefetch", row)
-                viewModel.fetchPokemons(indexOf: row, isImportant: false)
-            }
-        }
+//        for indexPath in indexPaths {
+//            let row = indexPath.row
+//            guard let pokemons = viewModel.pokemons else { return }
+//            if let _ = viewModel.pokemonImages[pokemons[row].nationalNumber] {
+//            } else {
+//                viewModel.fetchPokemons(indexOf: row, isImportant: false, nil) {
+////                    if (tableView.indexPathsForVisibleRows?.contains(indexPath) ?? false) {
+////                        cell.photo.image = self.viewModel.pokemonImages[$0!]
+////                    }
+//                }
+//            }
+//        }
         
     }
     
     func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
-        for indexPath in indexPaths {
-            viewModel.cancelFetchPokemons(indexOf: indexPath.row)
-        }
+//        for indexPath in indexPaths {
+//            viewModel.cancelFetchPokemons(indexOf: indexPath.row)
+//        }
     }
     
 }
 
-extension MainListViewController: UITableViewDataSource {
+extension MainListViewController {
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = listTableView.dequeueReusableCell(withIdentifier: tableCellIdentifier, for: indexPath) as! PokemonListTableViewCell
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: tableCellIdentifier, for: indexPath) as! PokemonListTableViewCell
         let row = indexPath.row
         guard let pokemons = viewModel.pokemons else { return cell }
-        let currentPokemon = pokemons[row]
+        let currentPokemon: PokemonData
+        if (isFiltering) {
+            currentPokemon = viewModel.filteredPokemons[row]
+        } else {
+            currentPokemon = pokemons[row]
+        }
         cell.tag = row
         cell.name.text = currentPokemon.name
-        if let image = viewModel.pokemonImages[row] {
+        if let image = viewModel.pokemonImages[currentPokemon.nationalNumber] {
             cell.photo.image = image
         } else {
-            viewModel.fetchPokemons(indexOf: row, isImportant: true)
+            viewModel.fetchPokemons(indexOf: row, isImportant: true, isFiltering) {
+//                cell.photo.image = self.viewModel.pokemonImages[currentPokemon.nationalNumber]
+                tableView.reloadData()
+//                else {
+//                tableView.reloadRows(at: [IndexPath(row: row, section: 0)], with: .none)
+//                }
+//                if (tableView.indexPathsForVisibleRows?.contains(indexPath) ?? false) {
+                    
+//                }
+            }
         }
 //        cell.photo.loadImageFromUrl(currentPokemon.sprites.large) {}
+        cell.changeCollectionViewWidth(calculateCollectionWidth(item: 72, space: 12, itemCount: currentPokemon.type.count))
         cell.setCollectionViewData(source: self, row: row)
         return cell
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    private func calculateCollectionWidth(item: CGFloat, space: CGFloat, itemCount: Int) -> CGFloat {
+        return item * CGFloat(itemCount) + space * CGFloat(itemCount - 1)
+    }
+    
+    override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        if (searchController.isActive) {
+            searchController.searchBar.endEditing(true)
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        print("keklikcancel", indexPath.row)
+        viewModel.cancelFetchPokemons(indexOf: indexPath.row)
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         guard let pokes = viewModel.pokemons else { return }
-        let curPokemon = pokes[indexPath.row]
+        let row = indexPath.row
+        let  curPokemon: PokemonData
+        if (isFiltering) {
+            curPokemon = viewModel.filteredPokemons[row]
+        } else {
+            curPokemon = pokes[indexPath.row]
+        }
         let name = curPokemon.name.lowercased()
         let id = Int(curPokemon.nationalNumber) ?? 2
         profileImage.isHidden = true //
+        searchController.searchBar.endEditing(true)
+//        navigationController?.navigationBar.prefersLargeTitles = false
         let infoVC = InfoViewController()//
         infoVC.setPokemonName(name: name)//
         infoVC.setPokemonId(id: id, imageId: curPokemon.nationalNumber)
         self.navigationController?.pushViewController(infoVC, animated: true) //
+    }
+    
+    private func endEditing() {
+        if (isFiltering || searchController.isActive) {
+            searchController.searchBar.endEditing(true)
+            searchController.searchBar.isHidden = true
+        }
     }
     
 }
@@ -245,14 +319,14 @@ extension MainListViewController: MainNotifier {
     
     func updateData() {
         DispatchQueue.main.async {
-            self.listTableView.reloadData()
+            self.tableView.reloadData()
         }
     }
     
     func updateRow(row: Int) {
         let indexPath = IndexPath(row: row, section: 0)
-        if (listTableView.indexPathsForVisibleRows?.contains(indexPath) ?? false) {
-            listTableView.reloadRows(at: [indexPath], with: .none)
+        if (tableView.indexPathsForVisibleRows?.contains(indexPath) ?? false) {
+            tableView.reloadRows(at: [indexPath], with: .none)
         }
     }
     
@@ -268,4 +342,26 @@ extension MainListViewController: MainNotifier {
         profileVC.modalPresentationStyle = .formSheet
         present(profileVC, animated: true, completion: nil)
     }
+}
+
+extension MainListViewController: UISearchResultsUpdating, UISearchBarDelegate {
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        let searchBar = searchController.searchBar
+        viewModel.filteredDataForSearch(searchBar.text!)
+    }
+    
+    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+        profileImage.isHidden = true
+        return true
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        profileImage.isHidden = true
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        profileImage.isHidden = false
+    }
+    
 }

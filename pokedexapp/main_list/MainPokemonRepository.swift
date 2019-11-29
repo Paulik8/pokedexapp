@@ -29,16 +29,15 @@ class MainPokemonRepository {
     
     func savePokemons(data: [PokemonData]) {
         DispatchQueue.main.async {
-            if let dbObjects = self.dbRef?.objects(PokemonData.self) {
+//            if let dbObjects = self.dbRef?.objects(PokemonData.self) {
                 try! self.dbRef?.write {
-                    self.dbRef?.delete(dbObjects)
-                    self.dbRef?.add(data)
+                    self.dbRef?.add(data, update: .all)
                 }
-            } else {
-                try! self.dbRef?.write {
-                self.dbRef?.add(data)
-                }
-            }
+//            } else {
+//                try! self.dbRef?.write {
+//                    self.dbRef?.add(data)
+//                }
+//            }
         }
     }
     

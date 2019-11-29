@@ -11,9 +11,10 @@ import UIKit
 class PokemonListTableViewCell: UITableViewCell {
     
     private  let collectionCellIdentifier = "pokemonCollectionList"
+    var collectionViewWidthConstraint: NSLayoutConstraint?
     
-    var photo: UIImageView! = {
-       let image = UIImageView(frame: CGRect(x: 0, y: 0, width: 140, height: 140))
+    lazy var photo: UIImageView! = {
+        let image = UIImageView(frame: CGRect(x: 0, y: 0, width: 140, height: 140))
         image.translatesAutoresizingMaskIntoConstraints = false
         return image
     }()
@@ -44,7 +45,13 @@ class PokemonListTableViewCell: UITableViewCell {
         super.init(coder: aDecoder)
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        photo.image = nil
+    }
+    
     func setCollectionViewData(source: UICollectionViewDataSource & UICollectionViewDelegateFlowLayout, row: Int) {
+        collection.backgroundColor = .clear
         collection.delegate = source
         collection.dataSource = source
         collection.tag = row
@@ -58,25 +65,31 @@ class PokemonListTableViewCell: UITableViewCell {
         contentView.addSubview(photo)
         contentView.addSubview(name)
         contentView.addSubview(collection)
+        
+        collectionViewWidthConstraint = collection.widthAnchor.constraint(equalToConstant: contentView.frame.width)
 
         NSLayoutConstraint.activate([
 
             photo.leadingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.leadingAnchor, constant: 8),
-            photo.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: 8),
-            photo.bottomAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.bottomAnchor, constant: -8),
+            photo.topAnchor.constraint(equalTo: contentView.topAnchor),
+            photo.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             photo.widthAnchor.constraint(equalToConstant: photo.frame.width),
             photo.heightAnchor.constraint(equalToConstant: photo.frame.height),
 
             name.leadingAnchor.constraint(equalTo: photo.trailingAnchor, constant: 8),
-            name.topAnchor.constraint(equalTo: photo.topAnchor),
+            name.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
             
             collection.topAnchor.constraint(equalTo: name.bottomAnchor, constant: 8),
             collection.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -8),
             collection.leadingAnchor.constraint(equalTo: photo.trailingAnchor, constant: 8),
             collection.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor, constant: -8),
-            collection.widthAnchor.constraint(equalToConstant: collection.frame.width),
+            collectionViewWidthConstraint!,
             collection.heightAnchor.constraint(equalToConstant: collection.frame.height)
             ])
+    }
+    
+    func changeCollectionViewWidth(_ width: CGFloat) {
+        collectionViewWidthConstraint?.constant = width
     }
     
 }

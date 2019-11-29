@@ -16,7 +16,7 @@ class InfoViewModel {
     let dbRef = ((UIApplication.shared.delegate) as? AppDelegate)?.realm
     let repository = PokemonInfoRepository.shared
     var subscriber: SubscriberDelegate?
-    var service = Service()
+    var service = NetworkService()
     
     var pokemonName: String?
     var idForImage: String?
@@ -51,10 +51,13 @@ class InfoViewModel {
     func createRequest(name: String, id: Int) {
         if let dbObject = repository.getPokemonInfo(byId: id) {
             self.pokemonInfo = dbObject
-            subscriber?.notify()
+            asyncUpdate {
+                self.subscriber?.notify()
+            }
         }
         service.getInfoPokemon(name: name)
-        poster.loadImageFromUrl(imageUrl + idForImage! +  ".png")  {
+        guard let imageId = idForImage else { return }
+        poster.loadImagePng(imageUrl, imageId) {
             print("keklik", self.poster.image)
             self.subscriber?.notify()
         }
@@ -127,6 +130,12 @@ class InfoViewModel {
         speciesChainIntermediateArr = arr
     }
     
+    private func asyncUpdate(update: @escaping () -> Void) {
+        DispatchQueue.main.async {
+            update()
+        }
+    }
+    
 }
 
 extension InfoViewModel: InfoNotifier, ChainNotifier {
@@ -152,7 +161,9 @@ extension InfoViewModel: InfoNotifier, ChainNotifier {
             return
         }
         repository.savePokemonInfo(data: info)
-        subscriber?.notify()
+        asyncUpdate {
+            self.subscriber?.notify()
+        }
     }
     
     //end

@@ -20,7 +20,7 @@ struct PokemonSpecies: Codable {
     let formsSwitchable: Bool
     let genderRate: Int
     let genera: [Genus]
-    let generation, growthRate, habitat: Color
+    let generation, growthRate, habitat: Color?
     let hasGenderDifferences: Bool
     let hatchCounter, id: Int
     let isBaby: Bool

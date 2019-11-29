@@ -25,16 +25,15 @@ class PokemonInfoRepository {
     
     func savePokemonInfo(data: PokemonStats) {
         DispatchQueue.main.async {
-            if let dbObject = self.dbRef?.objects(PokemonStats.self).filter("pokeId = \(data.pokeId)").first {
+//            if let dbObject = self.dbRef?.objects(PokemonStats.self).filter("pokeId = \(data.pokeId)").first {
                 try! self.dbRef?.write {
-                    self.dbRef?.delete(dbObject)
-                    self.dbRef?.add(data)
+                    self.dbRef?.add(data, update: .all)
                 }
-            } else {
-                try! self.dbRef?.write {
-                self.dbRef?.add(data)
-                }
-            }
+//            } else {
+//                try! self.dbRef?.write {
+//                self.dbRef?.add(data)
+//                }
+//            }
         }
     }
     
