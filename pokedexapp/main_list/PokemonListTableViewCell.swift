@@ -30,7 +30,6 @@ class PokemonListTableViewCell: UITableViewCell {
         let flowlayout = UICollectionViewFlowLayout()
         flowlayout.scrollDirection = .horizontal
         let col = UICollectionView(frame: contentView.frame, collectionViewLayout: flowlayout)
-        col.backgroundColor = Colors.DEFAULT_BACKGROUND
         col.register(TypeCollectionViewCell.self, forCellWithReuseIdentifier: collectionCellIdentifier)
         col.translatesAutoresizingMaskIntoConstraints = false
         return col

@@ -74,10 +74,16 @@ class MainViewModel: Notifier {
         return service.charCheck(name: name)
     }
     
-    func filteredDataForSearch(_ searchText: String) {
+    func filteredDataForSearch(filter searchText: String, isSearchBarEmpty: Bool, category: Type?) {
         guard let loadedPokemons = pokemons else { return }
         filteredPokemons = loadedPokemons.filter({ (pokemonItem: PokemonData) -> Bool in
+//            let doesCategoryMatch = category == .all || pokemonItem.type.contains(category.rawValue)
             return pokemonItem.name.lowercased().contains(searchText.lowercased())
+//            if isSearchBarEmpty {
+//                return doesCategoryMatch
+//            } else {
+//                return doesCategoryMatch && pokemonItem.name.lowercased().contains(searchText.lowercased())
+//            }
         })
         mainVC?.updateData()
     }

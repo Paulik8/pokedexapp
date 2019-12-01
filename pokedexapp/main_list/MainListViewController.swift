@@ -17,18 +17,39 @@ class MainListViewController: UITableViewController {
     
     private let tableCellIdentifier = "pokemonTableList"
     private let collectionCellIdentifier = "pokemonCollectionList"
+    private let filterCollectionCellIdentifier = "filterCollectionList"
     
     var topNavigationAnchor: NSLayoutConstraint?
     var profileImage: UIButton!
+    lazy var filterCollection: UICollectionView = {
+        let flowlayout = UICollectionViewFlowLayout()
+        flowlayout.scrollDirection = .horizontal
+        let col = UICollectionView(frame: view.frame, collectionViewLayout: flowlayout)
+        col.register(TypeCollectionViewCell.self, forCellWithReuseIdentifier: filterCollectionCellIdentifier)
+        col.translatesAutoresizingMaskIntoConstraints = false
+        col.delegate = self
+        col.dataSource = self
+        col.clipsToBounds = true
+        return col
+    }()
     
     var isSearchBarEmpty: Bool {
         return searchController.searchBar.text?.isEmpty ?? true
     }
     var isFiltering: Bool {
-        return searchController.isActive && !isSearchBarEmpty
+        let searchBarScopeIsFiltering =
+        searchController.searchBar.selectedScopeButtonIndex != 0
+        return searchController.isActive && (!isSearchBarEmpty || searchBarScopeIsFiltering)
     }
     
-    private let searchController = UISearchController(searchResultsController: nil)
+    private var searchController = UISearchController(searchResultsController: nil)
+    private var clicker = 0
+    
+    var container: UIView = {
+        let container = UIView()
+        container.translatesAutoresizingMaskIntoConstraints = false
+        return container
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,16 +59,44 @@ class MainListViewController: UITableViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-//        searchController.searchBar.isHidden = false
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        title = navigationTitle
+//        DispatchQueue.main.async {
+            self.profileImage.isHidden = false
+        self.searchController.searchBar.isHidden = false
+//            self.searchController = UISearchController(searchResultsController: nil)
+//            self.createSearch()
+//            self.tableView.setNeedsLayout()
+//            self.tableView.layoutIfNeeded()
+            
+//        }
+    }
+    
+    private func createSearch() {
+        searchController.searchResultsUpdater = self
+        navigationItem.searchController = searchController
+//        tableView.tableHeaderView = searchController.searchBar
+        
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "Search Pokemons"
+        
+        searchController.searchBar.delegate = self
+        searchController.navigationItem.hidesSearchBarWhenScrolling = true
+        definesPresentationContext = true
+        
+//        searchController.searchBar.scopeButtonTitles = Type.allCases.map { $0.rawValue }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
         if (searchController.isActive) {
-            profileImage.isHidden = true
-        } else {
-            profileImage.isHidden = false
+            title = nil
         }
+        searchController.searchBar.isHidden = true
+        viewModel.unsubscribe()
     }
     
     private func getData() {
@@ -59,29 +108,76 @@ class MainListViewController: UITableViewController {
     }
     
     private func setupUi() {
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.estimatedRowHeight = UITableView.automaticDimension
+        setupNavigationBar()
         tableView.delegate = self
         tableView.dataSource = self
         tableView.prefetchDataSource = self
         tableView.register(PokemonListTableViewCell.self, forCellReuseIdentifier: tableCellIdentifier)
-    
-        setupNavigationBar()
-        view.backgroundColor = .white
+        tableView.backgroundColor = .white
+        
+        
+//        tableView.translatesAutoresizingMaskIntoConstraints = false
+//        tableView.estimatedRowHeight = UITableView.automaticDimension
+        
     }
     
     private func setupNavigationBar() {
-        title = navigationTitle
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.largeTitleDisplayMode = .automatic
-        searchController.searchResultsUpdater = self
-        searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.placeholder = "Search Pokemons"
-        searchController.searchBar.delegate = self
-        searchController.navigationItem.hidesSearchBarWhenScrolling = true
-        definesPresentationContext = true
-        tableView.tableHeaderView = searchController.searchBar
+        navigationController?.navigationItem.largeTitleDisplayMode = .always
+        self.createSearch()
+        DispatchQueue.main.async {
+            self.setupFilterType()
+        }
         setupProfileLogo()
+    }
+    
+    private func setupFilterType() {
+        container.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: 34)
+        
+        filterCollection.backgroundColor = .red
+        
+//        container.addSubview(searchController.searchBar)
+        container.addSubview(filterCollection)
+        
+//        tableView.tableHeaderView?.addSubview(filterCollection)
+//        guard let navbar = navigationController?.navigationBar else { return }
+        let navbar = searchController.searchBar
+//        tableView.tableHeaderView?.addSubview(filterCollection)
+            
+//        self.tableView.tableHeaderView = container
+        
+        self.tableView.tableHeaderView = container
+        
+         NSLayoutConstraint.activate([
+            filterCollection.topAnchor.constraint(equalTo: container.topAnchor),
+            filterCollection.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 8),
+            filterCollection.widthAnchor.constraint(equalToConstant: filterCollection.frame.width),
+            filterCollection.heightAnchor.constraint(equalToConstant: 34),
+            
+            container.centerXAnchor.constraint(equalTo: self.tableView.centerXAnchor),
+            container.widthAnchor.constraint(equalTo: self.tableView.widthAnchor),
+            container.heightAnchor.constraint(equalToConstant: container.frame.height),
+            container.topAnchor.constraint(equalTo: self.tableView.topAnchor)
+        ])
+        
+        self.tableView.tableHeaderView = self.tableView.tableHeaderView
+        tableView.layoutIfNeeded()
+        
+//        hideFilterScopes()
+    }
+    
+    private func hideFilterScopes() {
+        container.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: searchController.searchBar.frame.height)
+        filterCollection.isHidden = true
+    }
+    
+    private func showFilterScopes() {
+        filterCollection.reloadData()
+//        container.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: searchController.searchBar.frame.height + 40)
+        filterCollection.isHidden = false
+        self.tableView.tableHeaderView?.frame = container.frame
+        tableView.layoutIfNeeded()
+        self.tableView.tableHeaderView = self.tableView.tableHeaderView
     }
     
     private func setupProfileLogo() {
@@ -152,39 +248,59 @@ class MainListViewController: UITableViewController {
         moveAndResizeImage(for: height)
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        viewModel.unsubscribe()
-    }
+//    override func viewWillDisappear(_ animated: Bool) {
+//        viewModel.unsubscribe()
+//    }
 
 }
 
 extension MainListViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let kek =  collectionView.tag
+        clicker += 1
+//        self.filterCollection.reloadData()
+        self.showFilterScopes()
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let pokes = viewModel.pokemons else { return 0 }
-        if (isFiltering) {
-            if (viewModel.filteredPokemons.count <= collectionView.tag) {
-                return 0
+        if (collectionView == filterCollection) {
+            return clicker
+        } else {
+            guard let pokes = viewModel.pokemons else { return 0 }
+            if (isFiltering) {
+                if (viewModel.filteredPokemons.count <= collectionView.tag) {
+                    return 0
+                }
+                return viewModel.filteredPokemons[collectionView.tag].type.count
             }
-            return viewModel.filteredPokemons[collectionView.tag].type.count
+            return pokes[collectionView.tag].type.count
         }
-        return pokes[collectionView.tag].type.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: collectionCellIdentifier, for: indexPath) as! TypeCollectionViewCell
-        guard let pokes = viewModel.pokemons else { return cell }
-        let currentType: String
-        if (isFiltering) {
-            print("kekType", collectionView.tag, indexPath.item)
-            currentType = viewModel.filteredPokemons[collectionView.tag].type[indexPath.item]
+        if (collectionView == filterCollection) {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: filterCollectionCellIdentifier, for: indexPath) as! TypeCollectionViewCell
+            let type = "Grass"
+            cell.type.text = type
+            cell.type.backgroundColor = cell.changeColor(type)
+            return cell
         } else {
-            print("kekType", collectionView.tag, indexPath.item)
-            currentType = pokes[collectionView.tag].type[indexPath.item]
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: collectionCellIdentifier, for: indexPath) as! TypeCollectionViewCell
+            guard let pokes = viewModel.pokemons else { return cell }
+            let currentType: String
+            if (isFiltering) {
+                print("kekType", collectionView.tag, indexPath.item)
+                currentType = viewModel.filteredPokemons[collectionView.tag].type[indexPath.item]
+            } else {
+                print("kekType", collectionView.tag, indexPath.item)
+                currentType = pokes[collectionView.tag].type[indexPath.item]
+            }
+            cell.type.text = currentType
+            cell.type.backgroundColor = cell.changeColor(currentType)
+            return cell
         }
-        cell.type.text = currentType
-        cell.type.backgroundColor = cell.changeColor(currentType)
-        return cell
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
@@ -192,7 +308,13 @@ extension MainListViewController: UICollectionViewDelegateFlowLayout, UICollecti
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: collectionCellIdentifier, for: indexPath) as! TypeCollectionViewCell
+        let cell: TypeCollectionViewCell
+        if (collectionView == filterCollection) {
+            cell = collectionView.dequeueReusableCell(withReuseIdentifier: filterCollectionCellIdentifier, for: indexPath) as! TypeCollectionViewCell
+        } else {
+            cell = collectionView.dequeueReusableCell(withReuseIdentifier: collectionCellIdentifier, for: indexPath) as! TypeCollectionViewCell
+        }
+        
         return CGSize(width: cell.type.frame.width, height: cell.type.frame.height)
     }
     
@@ -237,6 +359,14 @@ extension MainListViewController: UITableViewDataSourcePrefetching {
 }
 
 extension MainListViewController {
+    
+//    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+////        if (searchController.isActive) {
+////            return 44
+////        } else {
+////            return  0
+////        }
+//    }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: tableCellIdentifier, for: indexPath) as! PokemonListTableViewCell
@@ -299,6 +429,7 @@ extension MainListViewController {
         let id = Int(curPokemon.nationalNumber) ?? 2
         profileImage.isHidden = true //
         searchController.searchBar.endEditing(true)
+        searchBarCancelButtonClicked(searchController.searchBar)
 //        navigationController?.navigationBar.prefersLargeTitles = false
         let infoVC = InfoViewController()//
         infoVC.setPokemonName(name: name)//
@@ -346,22 +477,30 @@ extension MainListViewController: MainNotifier {
 
 extension MainListViewController: UISearchResultsUpdating, UISearchBarDelegate {
     
+    func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
+//        guard let category = Type(rawValue: searchBar.scopeButtonTitles![selectedScope]) else { return }
+        viewModel.filteredDataForSearch(filter: searchBar.text!, isSearchBarEmpty: isSearchBarEmpty, category: nil)
+    }
+    
     func updateSearchResults(for searchController: UISearchController) {
         let searchBar = searchController.searchBar
-        viewModel.filteredDataForSearch(searchBar.text!)
+//        showFilterScopes()
+//        guard let category = Type(rawValue: searchBar.scopeButtonTitles![searchBar.selectedScopeButtonIndex]) else { return }
+        viewModel.filteredDataForSearch(filter: searchBar.text!, isSearchBarEmpty: isSearchBarEmpty, category: nil)
     }
     
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-        profileImage.isHidden = true
+//        profileImage.isHidden = true
         return true
     }
     
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        profileImage.isHidden = true
-    }
+//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+//        profileImage.isHidden = true
+//    }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        profileImage.isHidden = false
+//        searchBar.showsScopeBar = false
+//        profileImage.isHidden = false
     }
     
 }

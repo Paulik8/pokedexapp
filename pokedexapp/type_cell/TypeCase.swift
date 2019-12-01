@@ -8,7 +8,8 @@
 
 import Foundation
 
-enum Type: String {
+enum Type: String, CaseIterable {
+    case all = "All"
     case grass = "Grass"
     case poison = "Poison"
     case fire = "Fire"
@@ -20,4 +21,5 @@ enum Type: String {
     case dark = "Dark"
     case electric = "Electric"
     case ice = "Ice"
+    
 }
