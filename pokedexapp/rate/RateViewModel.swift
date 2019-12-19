@@ -31,7 +31,6 @@ class RateViewModel {
     func loadEvolution() {
         guard let id = pokemonId else { return }
         guard let url = URL(string: "https://pokeapi.co/api/v2/pokemon-species/\(id)") else { return }
-        print ("url", url)
         URLSession.shared.dataTask(with: url, completionHandler: { (data, res, err) in
             if err != nil { return }
             guard let data = data else { return }
@@ -69,16 +68,13 @@ class RateViewModel {
         }
         while (next.count != 0) {
             arr.append(next[0].species)
-            print (next[0].evolvesTo)
             guard let nextStep = next[0].evolvesTo else {
                 speciesArray = arr
-//                fillNavBarArr()
                 return
             }
             next = nextStep
         }
         speciesArray = arr
-//        fillNavBarArr()
     }
     
 }

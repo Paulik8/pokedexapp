@@ -16,7 +16,7 @@ struct PokemonSpecies: Codable {
     let evolutionChain: EvolutionChain
     let evolvesFromSpecies: Color?
     let flavorTextEntries: [FlavorTextEntry]
-    let formDescriptions: [String]
+    let formDescriptions: [DescriptionForm]
     let formsSwitchable: Bool
     let genderRate: Int
     let genera: [Genus]
@@ -82,6 +82,11 @@ struct FlavorTextEntry: Codable {
 // MARK: - Genus
 struct Genus: Codable {
     let genus: String
+    let language: Color
+}
+
+struct DescriptionForm: Codable {
+    let description: String
     let language: Color
 }
 

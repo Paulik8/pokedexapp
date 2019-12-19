@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Crashlytics
 
 class MainListViewController: UITableViewController {
     
@@ -65,7 +66,9 @@ class MainListViewController: UITableViewController {
         super.viewDidAppear(animated)
         title = navigationTitle
 //        DispatchQueue.main.async {
+        if (!searchController.isActive) {
             self.profileImage.isHidden = false
+        }
         self.searchController.searchBar.isHidden = false
 //            self.searchController = UISearchController(searchResultsController: nil)
 //            self.createSearch()
@@ -79,14 +82,12 @@ class MainListViewController: UITableViewController {
         searchController.searchResultsUpdater = self
         navigationItem.searchController = searchController
 //        tableView.tableHeaderView = searchController.searchBar
-        
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = "Search Pokemons"
         
         searchController.searchBar.delegate = self
         searchController.navigationItem.hidesSearchBarWhenScrolling = true
         definesPresentationContext = true
-        
 //        searchController.searchBar.scopeButtonTitles = Type.allCases.map { $0.rawValue }
     }
     
@@ -114,8 +115,6 @@ class MainListViewController: UITableViewController {
         tableView.prefetchDataSource = self
         tableView.register(PokemonListTableViewCell.self, forCellReuseIdentifier: tableCellIdentifier)
         tableView.backgroundColor = .white
-        
-        
 //        tableView.translatesAutoresizingMaskIntoConstraints = false
 //        tableView.estimatedRowHeight = UITableView.automaticDimension
         
@@ -125,9 +124,9 @@ class MainListViewController: UITableViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationItem.largeTitleDisplayMode = .always
         self.createSearch()
-        DispatchQueue.main.async {
-            self.setupFilterType()
-        }
+//        DispatchQueue.main.async {
+//            self.setupFilterType()
+//        }
         setupProfileLogo()
     }
     
@@ -205,10 +204,7 @@ class MainListViewController: UITableViewController {
     }
     
     @objc private func longTouchProfile(state: UILongPressGestureRecognizer) {
-        if state.state == .ended {
-            viewModel.profileLongTouched()
-        }
-   
+        viewModel.profileLongTouched()
     }
     
     private func moveAndResizeImage(for height: CGFloat) { // viewModel or viewController
@@ -260,7 +256,7 @@ extension MainListViewController: UICollectionViewDelegateFlowLayout, UICollecti
         let kek =  collectionView.tag
         clicker += 1
 //        self.filterCollection.reloadData()
-        self.showFilterScopes()
+//        self.showFilterScopes()
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -290,10 +286,8 @@ extension MainListViewController: UICollectionViewDelegateFlowLayout, UICollecti
             guard let pokes = viewModel.pokemons else { return cell }
             let currentType: String
             if (isFiltering) {
-                print("kekType", collectionView.tag, indexPath.item)
                 currentType = viewModel.filteredPokemons[collectionView.tag].type[indexPath.item]
             } else {
-                print("kekType", collectionView.tag, indexPath.item)
                 currentType = pokes[collectionView.tag].type[indexPath.item]
             }
             cell.type.text = currentType
@@ -411,7 +405,6 @@ extension MainListViewController {
     }
     
     override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        print("keklikcancel", indexPath.row)
         viewModel.cancelFetchPokemons(indexOf: indexPath.row)
     }
     
@@ -429,7 +422,7 @@ extension MainListViewController {
         let id = Int(curPokemon.nationalNumber) ?? 2
         profileImage.isHidden = true //
         searchController.searchBar.endEditing(true)
-        searchBarCancelButtonClicked(searchController.searchBar)
+//        searchBarCancelButtonClicked(searchController.searchBar)
 //        navigationController?.navigationBar.prefersLargeTitles = false
         let infoVC = InfoViewController()//
         infoVC.setPokemonName(name: name)//
@@ -490,7 +483,7 @@ extension MainListViewController: UISearchResultsUpdating, UISearchBarDelegate {
     }
     
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-//        profileImage.isHidden = true
+        profileImage.isHidden = true
         return true
     }
     
@@ -500,7 +493,7 @@ extension MainListViewController: UISearchResultsUpdating, UISearchBarDelegate {
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
 //        searchBar.showsScopeBar = false
-//        profileImage.isHidden = false
+        profileImage.isHidden = false
     }
     
 }

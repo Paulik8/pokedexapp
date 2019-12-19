@@ -35,22 +35,6 @@ class SignupViewModel {
             }
             guard let uid = result?.user.uid else { return } // Need uid in local database?
             
-//            guard let uploadData = img.pngData() else { return }
-            
-//            let logoStorage = app?.storage.reference().child("logo").child("logo.png")
-//            storage?.putData(uploadData, metadata: nil, completion: { (metadata, err) in
-//                if let storageError = err {
-//                    print(storageError)
-//                    return
-//                }
-
-//            logoStorage?.downloadURL(completion: { (url, err) in
-//                if let urlError = err {
-//                    print(urlError)
-//                    return
-//                }
-//                guard let imageUrl = url else { return }
-            
             ref?.child("users").child(uid).setValue(["name": email, "password": password, "imageUrl": ""], withCompletionBlock: { (err, ref) in
                     if let dbErr = err {
                         print (dbErr)

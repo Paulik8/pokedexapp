@@ -133,6 +133,20 @@ class InfoViewController: UIViewController {
             }
         }
     }
+    
+    private func convertCharsPokemon(_ el: Int) -> String {
+        let elStr = String(el)
+        let item = elStr.last!
+        let addition = ".\(item)"
+        if (elStr.count == 1) {
+            return "0" + addition
+        } else {
+            let startInd = elStr.startIndex
+            let lastInd = elStr.index(elStr.endIndex, offsetBy: -1)
+            let range = startInd..<lastInd
+            return elStr[range] + addition
+        }
+    }
 
 }
 
@@ -141,8 +155,8 @@ extension InfoViewController: SubscriberDelegate, UIViewControllerTransitioningD
     func notify() {
 
         if let data = self.viewModel.pokemonInfo {
-            self.height.elementValue.text = "\(data.height)"
-            self.weight.elementValue.text = "\(data.weight)"
+            self.height.elementValue.text = convertCharsPokemon(data.height) + " m"
+            self.weight.elementValue.text = convertCharsPokemon(data.weight) + " kg"
         }
     
         if let image = self.viewModel.poster.image {

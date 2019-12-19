@@ -16,7 +16,13 @@ class InfoConverter {
         for stat in infoPokemon.stats {
             convertedStats.append(StatData(baseStat: stat.baseStat, effort: stat.effort, stat: SpeciesData(name: stat.stat.name, url: stat.stat.url)))
         } //CONVERTER
-        let stats = PokemonStats(stats: convertedStats)
+        let convertedAbilities = List<AbilityData>()
+        for ability in infoPokemon.abilities {
+            if (!ability.isHidden) {
+                convertedAbilities.append(AbilityData(name: ability.ability.name, url: ability.ability.url, descriptionName: ""))
+            }
+        }
+        let stats = PokemonStats(stats: convertedStats, abilities: convertedAbilities)
         stats.pokeId = infoPokemon.id
         stats.nationalNumber = idToNationalNumber(infoPokemon.id)
         stats.height = infoPokemon.height

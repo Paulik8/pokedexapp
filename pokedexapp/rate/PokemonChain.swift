@@ -11,7 +11,7 @@ import RealmSwift
 
 // MARK: - PokemonChain
 struct PokemonChain: Codable {
-    let babyTriggerItem: JSONNull?
+    let babyTriggerItem: ChainSpecies?
     let chain: Chain
     let id: Int?
     
@@ -41,14 +41,15 @@ struct EvolutionDetail: Codable {
     let gender, heldItem: JSONNull?
     let item: Species?
     let knownMove, knownMoveType: ChainSpecies?
-    let location, minAffection, minBeauty: JSONNull?
+    let location: ChainSpecies?
+    let minAffection, minBeauty: Int?
     let minHappiness: Int?
     let minLevel: Int?
     let needsOverworldRain: Bool?
-    let partySpecies, partyType, relativePhysicalStats: JSONNull?
+    let partySpecies, partyType, relativePhysicalStats: ChainSpecies?
     let timeOfDay: String?
     let tradeSpecies: JSONNull?
-    let trigger: Species
+    let trigger: ChainSpecies?
     let turnUpsideDown: Bool?
     
     enum CodingKeys: String, CodingKey {

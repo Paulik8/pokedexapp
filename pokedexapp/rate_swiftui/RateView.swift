@@ -95,7 +95,6 @@ struct ImageView: View {
     @State var image:UIImage = UIImage()
 
     init(withURL url:String) {
-        print ("withURL")
         imageLoader = ImageLoader(urlString:url)
     }
 

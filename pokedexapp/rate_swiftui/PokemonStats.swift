@@ -16,11 +16,15 @@ class PokemonStats: Object {
     @objc dynamic var height: Int = 0
     @objc dynamic var weight: Int = 0
     let stats = List<StatData>()
+    let abilities = List<AbilityData>()
     
-    convenience init(stats: List<StatData>) {
+    convenience init(stats: List<StatData>, abilities: List<AbilityData>) {
         self.init()
         for stat in stats {
             self.stats.append(stat)
+        }
+        for ability in abilities {
+            self.abilities.append(ability)
         }
     }
     

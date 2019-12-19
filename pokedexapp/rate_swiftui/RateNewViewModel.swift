@@ -59,10 +59,9 @@ class RateNewViewModel: ObservableObject {
                 self.name = self.imageUrl + self.pokemonStats!.nationalNumber + ".png"
                 self.numberOfPages = chainData.stats.count
                 self.untieChain(data: chainData)
-                print ("startObserveInitial")
             case .update(let results, let deletions, let insertions, let modifications):
+                break
 //                self.pokemonStats = self.app?.realm?.objects(PokemonStats.self).filter("id = \(id)").first
-                print ("startObserveUpdate")
             case .error:
                 break
             }

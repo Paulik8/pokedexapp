@@ -58,7 +58,6 @@ class InfoViewModel {
         service.getInfoPokemon(name: name)
         guard let imageId = idForImage else { return }
         poster.loadImagePng(imageUrl, imageId) {
-            print("keklik", self.poster.image)
             self.subscriber?.notify()
         }
     }
@@ -119,13 +118,19 @@ class InfoViewModel {
             speciesChainIntermediateArr = arr
             return
         }
-        while (next.count != 0) {
-            arr.append(next[0].species)
-            guard let nextStep = next[0].evolvesTo else {
-                speciesChainIntermediateArr = arr
-                return
+        if (next.count > 1) {
+            for item in next {
+                arr.append(item.species)
             }
-            next = nextStep
+        } else {
+            while (next.count != 0) {
+                arr.append(next[0].species)
+                guard let nextStep = next[0].evolvesTo else {
+                    speciesChainIntermediateArr = arr
+                    return
+                }
+                next = nextStep
+            }
         }
         speciesChainIntermediateArr = arr
     }

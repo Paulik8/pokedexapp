@@ -22,7 +22,6 @@ class RateViewController: UIViewController {
         col.translatesAutoresizingMaskIntoConstraints = false
         col.register(RateCell.self, forCellWithReuseIdentifier: collectionIdentifier)
         col.backgroundColor = .green
-        print ("keklik", view.frame)
         return col
     }()
     var pageControl: UIPageControl = {
@@ -38,7 +37,6 @@ class RateViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUi()
-        print ("keklik", view.frame)
         
 //        setupListeners()
 //        viewModel.loadEvolution()

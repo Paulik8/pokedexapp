@@ -56,6 +56,7 @@ class MainViewModel: Notifier {
         }
         let imageUrl = images + nationalNumber + extensionImages
         service.fetchWithDataTask(imageUrl, priority) {
+            print("cache", nationalNumber)
             self.cacheManager.cacheImage(id: nationalNumber, data: $0)
             self.pokemonImages[nationalNumber] = $0
             completion()
